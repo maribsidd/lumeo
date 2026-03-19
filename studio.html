@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Studio — Lumeo</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0a0a0f;--surface:#12121a;--card:#1a1a26;--card2:#20202e;--purple:#7c3aed;--violet:#8b5cf6;--pink:#ec4899;--cyan:#06b6d4;--green:#10b981;--red:#ef4444;--gold:#f59e0b;--text:#f1f0ff;--muted:#6b6a8a;--border:#2a2a3e;}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Space Grotesk',sans-serif}
+body{background:var(--bg);color:var(--text);min-height:100vh}
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100}
+.nav-logo{font-size:20px;font-weight:700;letter-spacing:-1px;background:linear-gradient(135deg,var(--violet),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;cursor:pointer}
+.nav-links{display:flex;gap:4px}
+.nav-links a{color:var(--muted);font-size:13px;font-weight:500;padding:6px 14px;border-radius:6px;text-decoration:none;transition:all .15s}
+.nav-links a:hover,.nav-links a.active{color:var(--violet);background:rgba(139,92,246,.08)}
+.user-dot{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--pink));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer;color:#fff}
+.page{max-width:1100px;margin:0 auto;padding:28px 20px}
+.page-head{margin-bottom:28px}
+.page-head h1{font-size:28px;font-weight:700;letter-spacing:-1px}
+.page-head p{font-size:14px;color:var(--muted);margin-top:6px}
+
+/* TABS */
+.tab-row{display:flex;gap:4px;margin-bottom:24px;background:var(--surface);padding:4px;border-radius:12px;width:fit-content}
+.tab-btn{padding:8px 20px;border-radius:9px;border:none;background:none;color:var(--muted);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;font-family:'Space Grotesk',sans-serif}
+.tab-btn.active{background:var(--card2);color:var(--text)}
+
+/* CARDS */
+.section-title{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:14px}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px}
+.feat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;cursor:pointer;transition:all .2s}
+.feat-card:hover{border-color:var(--violet);transform:translateY(-2px);box-shadow:0 6px 24px rgba(124,58,237,.12)}
+.fc-icon{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:12px}
+.fc-p{background:rgba(124,58,237,.1)}.fc-c{background:rgba(6,182,212,.1)}.fc-g{background:rgba(16,185,129,.1)}.fc-y{background:rgba(245,158,11,.1)}.fc-pk{background:rgba(236,72,153,.1)}
+.fc-title{font-size:14px;font-weight:600;margin-bottom:6px}
+.fc-desc{font-size:12px;color:var(--muted);line-height:1.6}
+.fc-badge{display:inline-block;margin-top:10px;padding:3px 9px;border-radius:4px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.badge-live{background:rgba(16,185,129,.1);color:var(--green)}
+.badge-soon{background:rgba(124,58,237,.1);color:var(--violet)}
+
+/* HOOK GENERATOR */
+.hook-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:20px}
+.hb-title{font-size:14px;font-weight:600;margin-bottom:14px}
+.hb-input{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:13px;outline:none;font-family:'Space Grotesk',sans-serif;margin-bottom:10px;resize:vertical;min-height:70px}
+.hb-input:focus{border-color:var(--violet)}
+.hb-input::placeholder{color:var(--muted)}
+.hb-row{display:flex;gap:10px;margin-bottom:14px}
+.hb-select{flex:1;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;outline:none;font-family:'Space Grotesk',sans-serif}
+.hb-btn{padding:10px 20px;background:linear-gradient(135deg,var(--purple),var(--pink));border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:'Space Grotesk',sans-serif;white-space:nowrap}
+.hb-btn:disabled{background:var(--border);cursor:default}
+.hook-results{display:flex;flex-direction:column;gap:10px}
+.hook-item{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px;position:relative}
+.hi-type{font-size:10px;color:var(--violet);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.hi-text{font-size:13px;color:var(--text);line-height:1.6}
+.hi-copy{position:absolute;top:12px;right:12px;padding:4px 10px;background:rgba(124,58,237,.1);border:none;border-radius:6px;color:var(--violet);font-size:11px;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+.hi-copy:hover{background:rgba(124,58,237,.2)}
+
+/* TITLE GENERATOR */
+.title-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:20px}
+.title-results{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.title-item{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .15s;position:relative}
+.title-item:hover{border-color:var(--violet)}
+.ti-style{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.ti-text{font-size:13px;color:var(--text);font-weight:500;line-height:1.4}
+.ti-score{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--green);margin-top:6px}
+.ti-copy{position:absolute;top:8px;right:8px;padding:3px 8px;background:rgba(124,58,237,.1);border:none;border-radius:4px;color:var(--violet);font-size:10px;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+
+/* CONTENT CALENDAR */
+.calendar-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.cal-title{font-size:14px;font-weight:600}
+.gen-btn{padding:8px 16px;background:linear-gradient(135deg,var(--purple),var(--pink));border:none;border-radius:8px;color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal-day-head{text-align:center;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:4px}
+.cal-day{min-height:70px;background:var(--card2);border-radius:8px;padding:8px;border:1px solid var(--border);cursor:pointer;transition:border-color .15s}
+.cal-day:hover{border-color:var(--violet)}
+.cal-day.has-post{border-color:rgba(124,58,237,.3);background:rgba(124,58,237,.05)}
+.cd-num{font-size:10px;color:var(--muted);margin-bottom:4px;font-family:'IBM Plex Mono',monospace}
+.cd-post{font-size:9px;color:var(--violet);background:rgba(124,58,237,.15);padding:2px 5px;border-radius:3px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cd-platform{font-size:8px;color:var(--muted)}
+
+/* LOADING */
+.loading{display:inline-flex;gap:4px;align-items:center;padding:4px 0}
+.loading span{width:5px;height:5px;border-radius:50%;background:var(--violet)}
+.loading span:nth-child(1){animation:ld .6s infinite 0s}
+.loading span:nth-child(2){animation:ld .6s infinite .12s}
+.loading span:nth-child(3){animation:ld .6s infinite .24s}
+@keyframes ld{0%,100%{opacity:.3}50%{opacity:1}}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--green);color:var(--green);padding:12px 20px;border-radius:10px;font-size:13px;z-index:999;display:none}
+.toast.show{display:block}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo" onclick="window.location.href='index.html'">Lumeo</div>
+  <div class="nav-links">
+    <a href="index.html">Dashboard</a>
+    <a href="upload.html">Upload</a>
+    <a href="clips.html">My Clips</a>
+    <a href="editor.html">Editor</a>
+    <a href="notebook.html">Notebook</a>
+    <a href="studio.html" class="active">Studio</a>
+  </div>
+  <div class="user-dot">A</div>
+</nav>
+<div id="profileDropdown" style="display:none;position:fixed;top:60px;right:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:999;min-width:220px"></div>
+<div class="toast" id="toast"></div>
+
+<div class="page">
+  <div class="page-head">
+    <h1>Studio</h1>
+    <p>AI content tools — hook writer, title generator, content calendar, and more.</p>
+  </div>
+
+  <!-- TABS -->
+  <div class="tab-row">
+    <button class="tab-btn active" onclick="showTab('tools',this)">AI Tools</button>
+    <button class="tab-btn" onclick="showTab('hooks',this)">Hook Writer</button>
+    <button class="tab-btn" onclick="showTab('titles',this)">Title Generator</button>
+    <button class="tab-btn" onclick="showTab('calendar',this)">Content Calendar</button>
+  </div>
+
+  <!-- TOOLS TAB -->
+  <div id="tab-tools">
+    <div class="section-title">All Studio Tools</div>
+    <div class="feat-grid">
+      <div class="feat-card" onclick="showTab('hooks',document.querySelectorAll('.tab-btn')[1])">
+        <div class="fc-icon fc-p">🪝</div>
+        <div class="fc-title">Hook Writer</div>
+        <div class="fc-desc">Generate 5 viral hook variations for any topic — curiosity, shock, authority, story, and stat styles.</div>
+        <span class="fc-badge badge-live">Live</span>
+      </div>
+      <div class="feat-card" onclick="showTab('titles',document.querySelectorAll('.tab-btn')[2])">
+        <div class="fc-icon fc-c">📌</div>
+        <div class="fc-title">Title Generator</div>
+        <div class="fc-desc">AI-powered YouTube title generator. Gives 8 title options with CTR score for each based on your content.</div>
+        <span class="fc-badge badge-live">Live</span>
+      </div>
+      <div class="feat-card" onclick="showTab('calendar',document.querySelectorAll('.tab-btn')[3])">
+        <div class="fc-icon fc-g">📅</div>
+        <div class="fc-title">Content Calendar</div>
+        <div class="fc-desc">Auto-generates a 30-day posting schedule from your uploaded videos with optimal posting times per platform.</div>
+        <span class="fc-badge badge-live">Live</span>
+      </div>
+      <div class="feat-card">
+        <div class="fc-icon fc-y">🎙️</div>
+        <div class="fc-title">Podcast Script</div>
+        <div class="fc-desc">Turn any video transcript into a structured podcast script with intro, segments, and outro.</div>
+        <span class="fc-badge badge-soon">Coming Soon</span>
+      </div>
+      <div class="feat-card">
+        <div class="fc-icon fc-pk">🖼️</div>
+        <div class="fc-title">Thumbnail A/B Test</div>
+        <div class="fc-desc">Generate 3 thumbnail variants per clip and run AI-predicted CTR comparison across the 6 styles.</div>
+        <span class="fc-badge badge-soon">Coming Soon</span>
+      </div>
+      <div class="feat-card">
+        <div class="fc-icon fc-p">📤</div>
+        <div class="fc-title">Auto Publisher</div>
+        <div class="fc-desc">Connect YouTube, Instagram, and TikTok — publish clips directly from Lumeo on a schedule.</div>
+        <span class="fc-badge badge-soon">Coming Soon</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOOKS TAB -->
+  <div id="tab-hooks" style="display:none">
+    <div class="hook-box">
+      <div class="hb-title">🪝 Hook Writer</div>
+      <textarea class="hb-input" id="hookTopic" placeholder="What is your video about? (e.g. 'I spent 30 days eating only street food in Mumbai')"></textarea>
+      <div class="hb-row">
+        <select class="hb-select" id="hookPlatform">
+          <option>YouTube</option>
+          <option>Instagram Reels</option>
+          <option>TikTok</option>
+          <option>LinkedIn</option>
+          <option>Twitter / X</option>
+        </select>
+        <button class="hb-btn" id="hookBtn" onclick="generateHooks()">Generate Hooks →</button>
+      </div>
+      <div class="hook-results" id="hookResults"></div>
+    </div>
+  </div>
+
+  <!-- TITLES TAB -->
+  <div id="tab-titles" style="display:none">
+    <div class="title-box">
+      <div class="hb-title">📌 YouTube Title Generator</div>
+      <textarea class="hb-input" id="titleTopic" placeholder="Describe your video (e.g. 'I tested every budget phone under 10,000 rupees for 30 days')"></textarea>
+      <div class="hb-row">
+        <select class="hb-select" id="titleStyle">
+          <option>Mixed — all styles</option>
+          <option>Curiosity Gap</option>
+          <option>How-To / Tutorial</option>
+          <option>Shock / Extreme</option>
+          <option>List / Ranking</option>
+          <option>Story / Personal</option>
+        </select>
+        <button class="hb-btn" id="titleBtn" onclick="generateTitles()">Generate Titles →</button>
+      </div>
+      <div class="title-results" id="titleResults"></div>
+    </div>
+  </div>
+
+  <!-- CALENDAR TAB -->
+  <div id="tab-calendar" style="display:none">
+    <div class="calendar-card">
+      <div class="cal-head">
+        <div class="cal-title">📅 30-Day Content Calendar</div>
+        <button class="gen-btn" onclick="generateCalendar()">Generate from My Videos</button>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+var BACKEND = 'http://localhost:3001';
+var jobs = JSON.parse(localStorage.getItem('lumeo_jobs') || '[]');
+
+function showTab(name, btn){
+  ['tools','hooks','titles','calendar'].forEach(function(t){
+    document.getElementById('tab-'+t).style.display = t===name?'block':'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  if(btn) btn.classList.add('active');
+}
+
+function showToast(msg){
+  var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},3000);
+}
+
+function escHtml(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+async function generateHooks(){
+  var topic = document.getElementById('hookTopic').value.trim();
+  if(!topic){ showToast('Enter a topic first'); return; }
+  var platform = document.getElementById('hookPlatform').value;
+  var btn = document.getElementById('hookBtn');
+  btn.disabled=true; btn.textContent='Generating...';
+  var results = document.getElementById('hookResults');
+  results.innerHTML = '<div class="loading"><span></span><span></span><span></span></div>';
+
+  try {
+    var res = await fetch(BACKEND+'/api/studio/hooks', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({topic, platform})
+    });
+    var data = await res.json();
+    var hooks = data.hooks || [];
+    results.innerHTML = hooks.map(function(h){
+      return '<div class="hook-item">'+
+        '<div class="hi-type">'+escHtml(h.type||'Hook')+'</div>'+
+        '<div class="hi-text">'+escHtml(h.text)+'</div>'+
+        '<button class="hi-copy" onclick="navigator.clipboard.writeText(\''+escHtml(h.text.replace(/'/g,"\\'"))+'\');showToast(\'Copied!\')">Copy</button>'+
+      '</div>';
+    }).join('');
+  } catch(e) {
+    results.innerHTML = '<div style="color:var(--muted);font-size:13px">Backend offline — run: cd backend → node server.js</div>';
+  }
+  btn.disabled=false; btn.textContent='Generate Hooks →';
+}
+
+async function generateTitles(){
+  var topic = document.getElementById('titleTopic').value.trim();
+  if(!topic){ showToast('Enter your video topic first'); return; }
+  var style = document.getElementById('titleStyle').value;
+  var btn = document.getElementById('titleBtn');
+  btn.disabled=true; btn.textContent='Generating...';
+  var results = document.getElementById('titleResults');
+  results.innerHTML = '<div class="loading"><span></span><span></span><span></span></div>';
+
+  try {
+    var res = await fetch(BACKEND+'/api/studio/titles', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({topic, style})
+    });
+    var data = await res.json();
+    var titles = data.titles || [];
+    results.innerHTML = titles.map(function(t){
+      return '<div class="title-item">'+
+        '<div class="ti-style">'+escHtml(t.style||'Title')+'</div>'+
+        '<div class="ti-text">'+escHtml(t.text)+'</div>'+
+        '<div class="ti-score">CTR score: '+( t.score||Math.floor(70+Math.random()*25))+'/100</div>'+
+        '<button class="ti-copy" onclick="navigator.clipboard.writeText(\''+escHtml(t.text.replace(/'/g,"\\'"))+'\');showToast(\'Copied!\')">Copy</button>'+
+      '</div>';
+    }).join('');
+  } catch(e) {
+    results.innerHTML = '<div style="color:var(--muted);font-size:13px">Backend offline — run: cd backend → node server.js</div>';
+  }
+  btn.disabled=false; btn.textContent='Generate Titles →';
+}
+
+function generateCalendar(){
+  var grid = document.getElementById('calGrid');
+  var days = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
+  var platforms = ['Instagram Reels','YouTube Shorts','TikTok','LinkedIn','Twitter/X'];
+  var allClips = [];
+  jobs.forEach(function(j){ (j.clips||[]).forEach(function(c){ allClips.push({title:c.title,platform:(j.settings&&j.settings.platform)||'Instagram Reels'}); }); });
+
+  var html = days.map(function(d){ return '<div class="cal-day-head">'+d+'</div>'; }).join('');
+
+  for(var day=1; day<=28; day++){
+    var hasPost = allClips.length > 0 && (day%2===0 || day%3===0);
+    var clip = hasPost ? allClips[day % allClips.length] : null;
+    html += '<div class="cal-day '+(hasPost?'has-post':'')+'">' +
+      '<div class="cd-num">'+day+'</div>'+
+      (clip?'<div class="cd-post">'+escHtml(clip.title.substring(0,18))+'</div><div class="cd-platform">'+escHtml(clip.platform)+'</div>':'')+
+    '</div>';
+  }
+
+  grid.innerHTML = html;
+  showToast('30-day calendar generated from your '+allClips.length+' clips');
+}
+
+// Init calendar
+generateCalendar();
+</script>
+<script src="nav.js"></script>
+</body>
+</html>

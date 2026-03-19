@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Lumeo — AI Video Automation</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0a0a0f;--surface:#12121a;--card:#1a1a26;--card2:#20202e;
+  --purple:#7c3aed;--violet:#8b5cf6;--pink:#ec4899;--cyan:#06b6d4;
+  --text:#f1f0ff;--muted:#6b6a8a;--border:#2a2a3e;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Space Grotesk',sans-serif}
+body{background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+/* animated bg */
+.bg-glow{position:absolute;inset:0;pointer-events:none}
+.glow1{position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,.15),transparent 70%);top:-200px;left:-200px;animation:float1 8s ease-in-out infinite}
+.glow2{position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(236,72,153,.1),transparent 70%);bottom:-100px;right:-100px;animation:float2 10s ease-in-out infinite}
+@keyframes float1{0%,100%{transform:translate(0,0)}50%{transform:translate(60px,40px)}}
+@keyframes float2{0%,100%{transform:translate(0,0)}50%{transform:translate(-40px,-30px)}}
+.wrap{position:relative;z-index:1;width:100%;max-width:400px;padding:20px}
+.logo-area{text-align:center;margin-bottom:32px}
+.logo{font-size:48px;font-weight:700;letter-spacing:-2px;background:linear-gradient(135deg,var(--violet),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.logo-tag{font-size:11px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-top:6px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px;box-shadow:0 32px 80px rgba(0,0,0,.5)}
+.card-title{font-size:18px;font-weight:600;margin-bottom:4px}
+.card-sub{font-size:13px;color:var(--muted);margin-bottom:24px}
+.field{margin-bottom:16px}
+.field label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px}
+.field input,.field select{width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:14px;outline:none;transition:border-color .2s;font-family:'Space Grotesk',sans-serif}
+.field input:focus,.field select:focus{border-color:var(--violet)}
+.field input::placeholder{color:var(--muted)}
+.field select option{background:var(--card)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--purple),var(--pink));border:none;border-radius:10px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;margin-top:8px;transition:opacity .2s;font-family:'Space Grotesk',sans-serif;letter-spacing:.3px}
+.btn:hover{opacity:.88}
+.err{color:#ef4444;font-size:12px;margin-top:8px;display:none}
+.disclaimer{font-size:11px;color:var(--muted);text-align:center;margin-top:14px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="bg-glow"><div class="glow1"></div><div class="glow2"></div></div>
+<div class="wrap">
+  <div class="logo-area">
+    <div class="logo">Lumeo</div>
+    <div class="logo-tag">AI Video Content Automation</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Get started</div>
+    <div class="card-sub">Free access · No credit card needed</div>
+    <div class="row2">
+      <div class="field"><label>First Name</label><input type="text" id="fname" placeholder="First Name"/></div>
+      <div class="field"><label>Last Name</label><input type="text" id="lname" placeholder="Last Name"/></div>
+    </div>
+    <div class="field"><label>Email Address</label><input type="email" id="email" placeholder="Email Address"/></div>
+    <div class="field"><label>Phone Number</label><input type="tel" id="phone" placeholder="Phone Number"/></div>
+    <div class="field"><label>Content Type</label>
+      <select id="ctype">
+        <option value="">Select your content type</option>
+        <option>YouTube Videos</option>
+        <option>Podcasts</option>
+        <option>Interviews</option>
+        <option>Webinars / Lectures</option>
+        <option>Social Media Content</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="err" id="err">Please fill in all fields.</div>
+    <button class="btn" onclick="login()">Start automating →</button>
+    <div class="disclaimer">Your data is stored locally and never shared.</div>
+  </div>
+</div>
+<script>
+function login(){
+  var fname=document.getElementById('fname').value.trim();
+  var lname=document.getElementById('lname').value.trim();
+  var email=document.getElementById('email').value.trim();
+  var phone=document.getElementById('phone').value.trim();
+  var ctype=document.getElementById('ctype').value;
+  var err=document.getElementById('err');
+  if(!fname||!lname||!email||!phone||!ctype){err.style.display='block';return;}
+  err.style.display='none';
+  localStorage.setItem('lumeo_user',JSON.stringify({fname,lname,email,phone,ctype,initials:(fname[0]+lname[0]).toUpperCase()}));
+  window.location.href='index.html';
+}
+document.querySelectorAll('input').forEach(i=>i.addEventListener('keydown',function(e){if(e.key==='Enter')login();}));
+if(localStorage.getItem('lumeo_user')) window.location.href='index.html';
+</script>
+</body>
+</html>

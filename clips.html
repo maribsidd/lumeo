@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>My Clips — Lumeo</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0a0a0f;--surface:#12121a;--card:#1a1a26;--card2:#20202e;--purple:#7c3aed;--violet:#8b5cf6;--pink:#ec4899;--cyan:#06b6d4;--green:#10b981;--red:#ef4444;--text:#f1f0ff;--muted:#6b6a8a;--border:#2a2a3e;}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Space Grotesk',sans-serif}
+body{background:var(--bg);color:var(--text);min-height:100vh}
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100}
+.nav-logo{font-size:20px;font-weight:700;letter-spacing:-1px;background:linear-gradient(135deg,var(--violet),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;cursor:pointer}
+.nav-links{display:flex;gap:4px}
+.nav-links a{color:var(--muted);font-size:13px;font-weight:500;padding:6px 14px;border-radius:6px;text-decoration:none;transition:all .15s}
+.nav-links a:hover,.nav-links a.active{color:var(--violet);background:rgba(139,92,246,.08)}
+.user-dot{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--pink));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer;color:#fff}
+.page{max-width:1100px;margin:0 auto;padding:32px 20px}
+.page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.ph-left h1{font-size:28px;font-weight:700;letter-spacing:-1px}
+.ph-left p{font-size:14px;color:var(--muted);margin-top:4px}
+.upload-btn{padding:10px 20px;background:linear-gradient(135deg,var(--purple),var(--pink));border:none;border-radius:10px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+.job-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.job-tab{padding:7px 16px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.job-tab:hover{border-color:var(--violet);color:var(--text)}
+.job-tab.active{background:rgba(124,58,237,.1);border-color:var(--violet);color:var(--violet)}
+.clips-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+
+/* CLIP CARD */
+.clip-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:all .2s}
+.clip-card:hover{border-color:var(--violet);transform:translateY(-2px);box-shadow:0 8px 28px rgba(124,58,237,.12)}
+.clip-thumb{position:relative;height:170px;background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(236,72,153,.1));overflow:hidden}
+.clip-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.clip-thumb video{width:100%;height:100%;object-fit:cover;display:none}
+.thumb-overlay{position:absolute;inset:0;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;transition:opacity .2s;cursor:pointer}
+.clip-thumb:hover .thumb-overlay{opacity:0}
+.play-btn{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.15);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;font-size:20px;border:2px solid rgba(255,255,255,.3)}
+.clip-num{position:absolute;top:10px;left:10px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:rgba(255,255,255,.7);background:rgba(0,0,0,.4);padding:3px 8px;border-radius:4px}
+.hook-badge{position:absolute;top:10px;right:10px;background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff;font-size:9px;font-weight:700;padding:3px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:.5px}
+.score-pill{position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,.6);color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:11px;padding:3px 8px;border-radius:4px}
+.no-thumb{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:36px;background:linear-gradient(135deg,rgba(124,58,237,.15),rgba(236,72,153,.08))}
+.clip-body{padding:16px}
+.clip-title{font-size:14px;font-weight:600;margin-bottom:6px;line-height:1.4}
+.clip-time{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:8px}
+.clip-caption{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.clip-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px}
+.tag{font-size:10px;color:var(--violet);background:rgba(124,58,237,.1);padding:2px 7px;border-radius:4px}
+.clip-actions{display:flex;gap:7px}
+.ca-btn{flex:1;padding:8px 6px;border-radius:8px;font-size:11px;font-weight:500;cursor:pointer;transition:all .15s;font-family:'Space Grotesk',sans-serif;border:1px solid var(--border);background:none;color:var(--muted)}
+.ca-btn:hover{border-color:var(--violet);color:var(--violet)}
+.ca-btn.primary{background:linear-gradient(135deg,var(--purple),var(--pink));border:none;color:#fff}
+.ca-btn.primary:hover{opacity:.85}
+.ca-btn.dl{background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.3);color:var(--green)}
+.ca-btn.dl:hover{background:rgba(16,185,129,.2)}
+
+/* TRANSCRIPT */
+.transcript-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-top:22px}
+.tc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.tc-title{font-size:13px;font-weight:600}
+.tc-copy{font-size:12px;color:var(--violet);cursor:pointer}
+.tc-text{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);line-height:1.8;max-height:180px;overflow-y:auto}
+.tc-text::-webkit-scrollbar{width:4px}
+.tc-text::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-state .es-icon{font-size:48px;margin-bottom:16px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--green);color:var(--green);padding:12px 20px;border-radius:10px;font-size:13px;z-index:999;display:none}
+.toast.show{display:block}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo" onclick="window.location.href='index.html'">Lumeo</div>
+  <div class="nav-links">
+    <a href="index.html">Dashboard</a>
+    <a href="upload.html">Upload</a>
+    <a href="clips.html" class="active">My Clips</a>
+    <a href="editor.html">Editor</a>
+  </div>
+  <div class="user-dot">A</div>
+</nav>
+<div id="profileDropdown" style="display:none;position:fixed;top:60px;right:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:999;min-width:220px"></div>
+<div class="toast" id="toast"></div>
+
+<div class="page">
+  <div class="page-head">
+    <div class="ph-left">
+      <h1>My Clips</h1>
+      <p>Real clips cut from your videos by ffmpeg</p>
+    </div>
+    <button class="upload-btn" onclick="window.location.href='upload.html'">+ New Video</button>
+  </div>
+  <div id="mainContent"></div>
+</div>
+
+<script>
+var BACKEND = 'http://localhost:3001';
+var jobs = JSON.parse(localStorage.getItem('lumeo_jobs') || '[]');
+var currentJobId = null;
+
+function fmtTime(s){var m=Math.floor(s/60);var sec=Math.round(s%60);return m+':'+(sec<10?'0':'')+sec;}
+function escHtml(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function render(){
+  var mc = document.getElementById('mainContent');
+  if(jobs.length === 0){
+    mc.innerHTML='<div class="empty-state"><div class="es-icon">🎬</div><p>No clips yet.</p><button class="upload-btn" onclick="window.location.href=\'upload.html\'">Upload a Video</button></div>';
+    return;
+  }
+
+  if(!currentJobId) currentJobId = jobs[jobs.length-1].id;
+  var job = jobs.find(function(j){return j.id===currentJobId;}) || jobs[jobs.length-1];
+
+  // Tabs
+  var tabs = '<div class="job-tabs">';
+  jobs.forEach(function(j){
+    tabs += '<div class="job-tab '+(j.id===currentJobId?'active':'')+'" onclick="selectJob('+j.id+')">'+escHtml(j.name.substring(0,28))+'</div>';
+  });
+  tabs += '</div>';
+
+  // Clips grid
+  var grid = '<div class="clips-grid">';
+  (job.clips||[]).forEach(function(c){
+    var tags = (c.hashtags||'').split(' ').filter(function(t){return t.startsWith('#');}).slice(0,4);
+    var hasThumb = c.thumbUrl;
+    var hasClip = c.clipUrl;
+    var thumbSrc = hasThumb ? (BACKEND+c.thumbUrl) : null;
+    var clipSrc = hasClip ? (BACKEND+c.clipUrl) : null;
+
+    grid += '<div class="clip-card">'+
+      '<div class="clip-thumb" id="thumb'+c.id+'" onclick="togglePlay(\''+c.id+'\',\''+escHtml(clipSrc||'')+'\')">'+
+        '<div class="clip-num">CLIP '+c.id+'</div>'+
+        (c.hook?'<div class="hook-badge">🔥 Hook</div>':'')+
+        '<div class="score-pill">'+c.score+'/100</div>'+
+        (c.thumbnailStyle?'<div style="position:absolute;bottom:10px;left:10px;background:rgba(124,58,237,.8);color:#fff;font-size:9px;font-weight:700;padding:3px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:.5px">✨ AI: '+escHtml(c.thumbnailStyle||'')+'</div>':'')+
+        (thumbSrc?'<img src="'+thumbSrc+'" alt="thumbnail" onerror="this.style.display=\'none\'"/>':'<div class="no-thumb">🎬</div>')+
+        '<div class="thumb-overlay" id="overlay'+c.id+'"><div class="play-btn">▶</div></div>'+
+        (clipSrc?'<video id="vid'+c.id+'" src="'+clipSrc+'" controls style="display:none;width:100%;height:100%;object-fit:cover;position:absolute;inset:0"></video>':'')+
+      '</div>'+
+      '<div class="clip-body">'+
+        '<div class="clip-title">'+escHtml(c.title)+'</div>'+
+        '<div class="clip-time">'+fmtTime(c.start)+' → '+fmtTime(c.end)+'  ·  '+(c.end-c.start)+'s</div>'+
+        '<div class="clip-caption">'+escHtml(c.caption)+'</div>'+
+        '<div class="clip-tags">'+tags.map(function(t){return '<span class="tag">'+escHtml(t)+'</span>';}).join('')+'</div>'+
+        '<div class="clip-actions">'+
+          '<button class="ca-btn" onclick="copyText(\''+escHtml((c.caption||'').replace(/'/g,"\\'"))+'\')">Copy Caption</button>'+
+          (clipSrc?'<button class="ca-btn dl" onclick="downloadClip(\''+escHtml(clipSrc)+'\',\''+escHtml(c.title)+'\')">⬇ Download</button>':'')+
+          '<button class="ca-btn primary" onclick="editClip('+c.id+','+currentJobId+')">Edit</button>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  });
+  grid += '</div>';
+
+  // Transcript
+  var trans = '<div class="transcript-card">'+
+    '<div class="tc-head"><div class="tc-title">📝 Transcript</div><div class="tc-copy" onclick="copyText(\''+escHtml((job.transcript||'').replace(/'/g,"\\'"))+'\')">Copy</div></div>'+
+    '<div class="tc-text">'+escHtml(job.transcript||'No transcript available.')+'</div>'+
+  '</div>';
+
+  mc.innerHTML = tabs + grid + trans;
+}
+
+function togglePlay(clipId, src){
+  if(!src) return;
+  var vid = document.getElementById('vid'+clipId);
+  var overlay = document.getElementById('overlay'+clipId);
+  var thumb = document.getElementById('thumb'+clipId);
+  if(!vid) return;
+  var img = thumb.querySelector('img');
+  var noThumb = thumb.querySelector('.no-thumb');
+  if(vid.style.display === 'none'){
+    if(img) img.style.display = 'none';
+    if(noThumb) noThumb.style.display = 'none';
+    vid.style.display = 'block';
+    overlay.style.display = 'none';
+    vid.play();
+  } else {
+    vid.pause();
+    vid.style.display = 'none';
+    if(img) img.style.display = 'block';
+    if(noThumb) noThumb.style.display = 'flex';
+    overlay.style.display = 'flex';
+  }
+}
+
+function downloadClip(url, title){
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = (title||'clip').replace(/[^a-z0-9]/gi,'_') + '.mp4';
+  a.click();
+}
+
+function copyText(text){
+  navigator.clipboard.writeText(text).then(function(){showToast('Copied!');}).catch(function(){showToast('Copy failed');});
+}
+
+function editClip(id, jobId){
+  window.location.href = 'editor.html?clip='+id+'&job='+jobId;
+}
+
+function selectJob(id){
+  currentJobId = id;
+  render();
+}
+
+function showToast(msg){
+  var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},3000);
+}
+
+render();
+</script>
+<script src="nav.js"></script>
+</body>
+</html>

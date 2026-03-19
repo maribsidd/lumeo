@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Editor — Lumeo</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0a0a0f;--surface:#12121a;--card:#1a1a26;--card2:#20202e;--purple:#7c3aed;--violet:#8b5cf6;--pink:#ec4899;--cyan:#06b6d4;--green:#10b981;--red:#ef4444;--text:#f1f0ff;--muted:#6b6a8a;--border:#2a2a3e;}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Space Grotesk',sans-serif}
+body{background:var(--bg);color:var(--text);min-height:100vh}
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100}
+.nav-logo{font-size:20px;font-weight:700;letter-spacing:-1px;background:linear-gradient(135deg,var(--violet),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;cursor:pointer}
+.nav-links{display:flex;gap:4px}
+.nav-links a{color:var(--muted);font-size:13px;font-weight:500;padding:6px 14px;border-radius:6px;text-decoration:none;transition:all .15s}
+.nav-links a:hover,.nav-links a.active{color:var(--violet);background:rgba(139,92,246,.08)}
+.user-dot{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--pink));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer;color:#fff}
+.layout{display:grid;grid-template-columns:1fr 360px;height:calc(100vh - 56px);overflow:hidden}
+.editor-main{padding:24px;overflow-y:auto}
+.editor-main::-webkit-scrollbar{width:4px}
+.editor-main::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.editor-sidebar{background:var(--surface);border-left:1px solid var(--border);padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+.back-link{font-size:13px;color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;gap:6px;margin-bottom:18px;transition:color .15s}
+.back-link:hover{color:var(--text)}
+.preview-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:18px}
+.preview-video{width:100%;max-height:260px;background:#000;display:block}
+.preview-fallback{height:200px;background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(236,72,153,.1));display:flex;align-items:center;justify-content:center;font-size:40px}
+.preview-meta{padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
+.pm-time{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted)}
+.pm-score{font-size:12px;color:var(--green);font-weight:600}
+.field label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px}
+.field input,.field textarea{width:100%;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:13px;outline:none;transition:border-color .2s;font-family:'Space Grotesk',sans-serif;resize:vertical}
+.field textarea{min-height:80px}
+.field input:focus,.field textarea:focus{border-color:var(--violet)}
+.ai-btn{width:100%;padding:10px;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.3);border-radius:8px;color:var(--violet);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;font-family:'Space Grotesk',sans-serif}
+.ai-btn:hover{background:rgba(124,58,237,.18)}
+.ai-btn:disabled{opacity:.5;cursor:default}
+.plat-tabs{display:flex;gap:6px;margin-bottom:10px}
+.plat-tab{padding:5px 12px;border-radius:6px;border:1px solid var(--border);font-size:11px;cursor:pointer;color:var(--muted);transition:all .15s;font-weight:500}
+.plat-tab.active{border-color:var(--violet);color:var(--violet);background:rgba(124,58,237,.08)}
+.plat-preview{background:var(--card2);border-radius:8px;padding:12px;font-size:12px;color:var(--muted);line-height:1.7}
+.save-btn{width:100%;padding:12px;background:linear-gradient(135deg,var(--purple),var(--pink));border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+.dl-btn{width:100%;padding:10px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:10px;color:var(--green);font-size:13px;font-weight:500;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+.dl-btn:hover{background:rgba(16,185,129,.2)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--green);color:var(--green);padding:12px 20px;border-radius:10px;font-size:13px;z-index:999;display:none}
+.toast.show{display:block}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo" onclick="window.location.href='index.html'">Lumeo</div>
+  <div class="nav-links">
+    <a href="index.html">Dashboard</a>
+    <a href="upload.html">Upload</a>
+    <a href="clips.html">My Clips</a>
+    <a href="editor.html" class="active">Editor</a>
+  </div>
+  <div class="user-dot">A</div>
+</nav>
+<div id="profileDropdown" style="display:none;position:fixed;top:60px;right:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:999;min-width:220px"></div>
+<div class="toast" id="toast"></div>
+
+<div class="layout">
+  <div class="editor-main" id="editorMain">
+    <div class="back-link" onclick="window.location.href='clips.html'">← Back to clips</div>
+    <div id="editorContent"></div>
+  </div>
+  <div class="editor-sidebar" id="editorSidebar"></div>
+</div>
+
+<script>
+var BACKEND = 'http://localhost:3001';
+var params = new URLSearchParams(window.location.search);
+var clipId = parseInt(params.get('clip') || 1);
+var jobId = parseInt(params.get('job') || 0);
+var jobs = JSON.parse(localStorage.getItem('lumeo_jobs') || '[]');
+var job = jobs.find(function(j){ return j.id === jobId; }) || jobs[jobs.length-1];
+var clip = job ? (job.clips.find(function(c){ return c.id === clipId; }) || job.clips[0]) : null;
+
+function fmtTime(s){var m=Math.floor(s/60);var sec=Math.round(s%60);return m+':'+(sec<10?'0':'')+sec;}
+function escHtml(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function init(){
+  if(!clip){
+    document.getElementById('editorContent').innerHTML='<p style="color:var(--muted)">No clip found. <a href="upload.html" style="color:var(--violet)">Upload a video →</a></p>';
+    return;
+  }
+
+  var clipSrc = clip.clipUrl ? BACKEND + clip.clipUrl : null;
+  var thumbSrc = clip.thumbUrl ? BACKEND + clip.thumbUrl : null;
+
+  // Main content
+  document.getElementById('editorContent').innerHTML =
+    '<div class="preview-card">'+
+      (clipSrc
+        ? '<video class="preview-video" src="'+clipSrc+'" controls poster="'+(thumbSrc||'')+'"></video>'
+        : '<div class="preview-fallback">🎬</div>')+
+      '<div class="preview-meta">'+
+        '<div class="pm-time">'+fmtTime(clip.start)+' → '+fmtTime(clip.end)+'  ·  '+(clip.end-clip.start)+'s</div>'+
+        '<div class="pm-score">Score: '+clip.score+'/100</div>'+
+      '</div>'+
+    '</div>';
+
+  // Sidebar
+  document.getElementById('editorSidebar').innerHTML =
+    '<div class="field"><label>Title</label><input type="text" id="editTitle" value="'+escHtml(clip.title||'')+'"/></div>'+
+    '<div class="field"><label>Caption</label><textarea id="editCaption">'+escHtml(clip.caption||'')+'</textarea></div>'+
+    '<div class="field"><label>Hashtags</label><input type="text" id="editHashtags" value="'+escHtml(clip.hashtags||'')+'"/></div>'+
+    '<button class="ai-btn" id="aiBtn" onclick="improveWithAI()">✨ Improve with AI</button>'+
+    '<div>'+
+      '<div class="plat-tabs">'+
+        '<div class="plat-tab active" onclick="setPlatform(this,\'Reels\')">Reels</div>'+
+        '<div class="plat-tab" onclick="setPlatform(this,\'Shorts\')">Shorts</div>'+
+        '<div class="plat-tab" onclick="setPlatform(this,\'LinkedIn\')">LinkedIn</div>'+
+      '</div>'+
+      '<div class="plat-preview" id="platPreview"></div>'+
+    '</div>'+
+    (clipSrc?'<button class="dl-btn" onclick="downloadClip()">⬇ Download Clip</button>':'')+
+    '<button class="save-btn" onclick="saveClip()">Save Changes</button>';
+
+  updatePlatPreview('Reels');
+}
+
+function setPlatform(tab, plat){
+  document.querySelectorAll('.plat-tab').forEach(function(t){t.classList.remove('active');});
+  tab.classList.add('active');
+  updatePlatPreview(plat);
+}
+
+function updatePlatPreview(plat){
+  var title = document.getElementById('editTitle') ? document.getElementById('editTitle').value : clip.title;
+  var cap = document.getElementById('editCaption') ? document.getElementById('editCaption').value : clip.caption;
+  var pp = document.getElementById('platPreview');
+  if(!pp) return;
+  if(plat==='Reels') pp.innerHTML = '📸 <strong style="color:var(--text)">Instagram Reels</strong><br><br>'+escHtml((cap||'').substring(0,120))+'...<br><br><span style="color:var(--violet)">'+escHtml((clip.hashtags||'').substring(0,60))+'</span>';
+  else if(plat==='Shorts') pp.innerHTML = '▶ <strong style="color:var(--text)">YouTube Shorts</strong><br><br><strong style="color:var(--text)">'+escHtml(title)+'</strong><br><br>'+escHtml((cap||'').substring(0,100))+'...';
+  else pp.innerHTML = '💼 <strong style="color:var(--text)">LinkedIn</strong><br><br>'+escHtml(title)+'<br><br>'+escHtml((cap||'').substring(0,150))+'...<br><br><span style="color:var(--violet)">#ContentMarketing #VideoStrategy</span>';
+}
+
+async function improveWithAI(){
+  var btn = document.getElementById('aiBtn');
+  btn.disabled = true; btn.textContent = 'Improving...';
+  var title = document.getElementById('editTitle').value;
+  var caption = document.getElementById('editCaption').value;
+  var plat = document.querySelector('.plat-tab.active')?.textContent || 'Reels';
+  try {
+    var res = await fetch(BACKEND + '/api/improve', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({title, caption, platform: plat})
+    });
+    if(!res.ok) throw new Error('Server error');
+    var d = await res.json();
+    if(d.title) document.getElementById('editTitle').value = d.title;
+    if(d.caption) document.getElementById('editCaption').value = d.caption;
+    if(d.hashtags) document.getElementById('editHashtags').value = d.hashtags;
+    updatePlatPreview(plat);
+    showToast('AI improved your caption');
+  } catch(e) {
+    showToast('Backend offline — run: cd backend → node server.js');
+  }
+  btn.disabled = false; btn.textContent = '✨ Improve with AI';
+}
+
+function downloadClip(){
+  if(!clip.clipUrl) return;
+  var a = document.createElement('a');
+  a.href = BACKEND + clip.clipUrl;
+  a.download = (clip.title||'clip').replace(/[^a-z0-9]/gi,'_') + '.mp4';
+  a.click();
+}
+
+function saveClip(){
+  var title = document.getElementById('editTitle').value;
+  var caption = document.getElementById('editCaption').value;
+  var hashtags = document.getElementById('editHashtags').value;
+  var jobs2 = JSON.parse(localStorage.getItem('lumeo_jobs')||'[]');
+  var ji = jobs2.findIndex(function(j){return j.id===job.id;});
+  if(ji>-1){
+    var ci = jobs2[ji].clips.findIndex(function(c){return c.id===clip.id;});
+    if(ci>-1){ jobs2[ji].clips[ci].title=title; jobs2[ji].clips[ci].caption=caption; jobs2[ji].clips[ci].hashtags=hashtags; }
+    localStorage.setItem('lumeo_jobs', JSON.stringify(jobs2));
+  }
+  showToast('Saved');
+}
+
+function showToast(msg){
+  var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},3000);
+}
+
+init();
+</script>
+<script src="nav.js"></script>
+</body>
+</html>

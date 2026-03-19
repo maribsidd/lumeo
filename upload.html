@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Upload — Lumeo</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0a0a0f;--surface:#12121a;--card:#1a1a26;--card2:#20202e;--purple:#7c3aed;--violet:#8b5cf6;--pink:#ec4899;--cyan:#06b6d4;--green:#10b981;--red:#ef4444;--text:#f1f0ff;--muted:#6b6a8a;--border:#2a2a3e;}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Space Grotesk',sans-serif}
+body{background:var(--bg);color:var(--text);min-height:100vh}
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100}
+.nav-logo{font-size:20px;font-weight:700;letter-spacing:-1px;background:linear-gradient(135deg,var(--violet),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;cursor:pointer}
+.nav-links{display:flex;gap:4px}
+.nav-links a{color:var(--muted);font-size:13px;font-weight:500;padding:6px 14px;border-radius:6px;text-decoration:none;transition:all .15s}
+.nav-links a:hover,.nav-links a.active{color:var(--violet);background:rgba(139,92,246,.08)}
+.user-dot{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--pink));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer;color:#fff}
+.page{max-width:800px;margin:0 auto;padding:32px 20px}
+.page-head{margin-bottom:28px}
+.page-head h1{font-size:28px;font-weight:700;letter-spacing:-1px}
+.page-head p{font-size:14px;color:var(--muted);margin-top:6px}
+.upload-zone{background:var(--card);border:2px dashed var(--border);border-radius:20px;padding:60px 40px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:20px;position:relative}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--violet);background:rgba(124,58,237,.06)}
+.upload-zone.has-file{border-color:var(--green);border-style:solid;background:rgba(16,185,129,.04)}
+.uz-icon{font-size:48px;margin-bottom:16px}
+.uz-title{font-size:16px;font-weight:600;margin-bottom:6px}
+.uz-sub{font-size:13px;color:var(--muted)}
+.uz-file{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--green);margin-top:10px}
+#fileInput{position:absolute;inset:0;opacity:0;cursor:pointer}
+.settings-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:24px}
+.sc-title{font-size:13px;font-weight:600;margin-bottom:16px}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.setting-row:last-child{border-bottom:none}
+.sr-label{font-size:13px}
+.sr-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.sr-control select{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text);font-size:13px;outline:none;font-family:'Space Grotesk',sans-serif}
+.toggle{width:40px;height:22px;background:var(--border);border-radius:20px;cursor:pointer;position:relative;transition:background .2s;border:none;flex-shrink:0}
+.toggle.on{background:linear-gradient(90deg,var(--purple),var(--pink))}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s}
+.toggle.on::after{left:21px}
+.process-btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--purple),var(--pink));border:none;border-radius:12px;color:#fff;font-size:16px;font-weight:600;cursor:pointer;transition:opacity .2s;font-family:'Space Grotesk',sans-serif}
+.process-btn:hover{opacity:.85}
+.process-btn:disabled{background:var(--border);cursor:default;opacity:1}
+.progress-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;display:none;margin-top:20px}
+.progress-title{font-size:15px;font-weight:600;margin-bottom:16px}
+.prog-step{display:flex;align-items:center;gap:12px;margin-bottom:12px;font-size:13px;color:var(--muted)}
+.prog-dot{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;border:2px solid var(--border);color:var(--muted);font-weight:600}
+.prog-dot.done{background:var(--green);border-color:var(--green);color:#fff}
+.prog-dot.active{background:rgba(124,58,237,.2);border-color:var(--violet);color:var(--violet);animation:pulse .8s infinite}
+.prog-step.active-step{color:var(--text)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.prog-bar{height:4px;background:var(--border);border-radius:2px;margin-top:16px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--pink));border-radius:2px;width:0%;transition:width .6s ease}
+.prog-note{font-size:12px;color:var(--muted);margin-top:10px;font-family:'IBM Plex Mono',monospace}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:12px 20px;border-radius:10px;font-size:13px;z-index:999;display:none;border:1px solid var(--red);color:var(--red);background:var(--surface)}
+.toast.show{display:block}
+.toast.success{border-color:var(--green);color:var(--green)}
+.ffmpeg-note{background:rgba(6,182,212,.06);border:1px solid rgba(6,182,212,.2);border-radius:10px;padding:12px 16px;font-size:12px;color:var(--cyan);margin-bottom:20px;line-height:1.6}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo" onclick="window.location.href='index.html'">Lumeo</div>
+  <div class="nav-links">
+    <a href="index.html">Dashboard</a>
+    <a href="upload.html" class="active">Upload</a>
+    <a href="clips.html">My Clips</a>
+    <a href="editor.html">Editor</a>
+  </div>
+  <div class="user-dot">A</div>
+</nav>
+<div id="profileDropdown" style="display:none;position:fixed;top:60px;right:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:999;min-width:220px"></div>
+<div class="toast" id="toast"></div>
+
+<div class="page">
+  <div class="page-head">
+    <h1>Upload Video</h1>
+    <p>Upload a video — Lumeo transcribes it, finds the best moments, and cuts real clips with thumbnails.</p>
+  </div>
+
+  <div class="ffmpeg-note">
+    ⚡ Real video processing — clips are actually cut with ffmpeg, thumbnails grabbed from frames, transcribed with Groq Whisper. Make sure backend is running: <strong>cd backend → node server.js</strong>
+  </div>
+
+  <div class="upload-zone" id="uploadZone">
+    <input type="file" id="fileInput" accept="video/*,audio/*" onchange="handleFile(this.files[0])"/>
+    <div class="uz-icon" id="uzIcon">🎬</div>
+    <div class="uz-title" id="uzTitle">Drop your video here</div>
+    <div class="uz-sub">MP4, MOV, AVI, MKV, MP3 — any format ffmpeg supports</div>
+    <div class="uz-file" id="uzFile"></div>
+  </div>
+
+  <div style="text-align:center;color:var(--muted);font-size:12px;margin:14px 0;position:relative">
+    <span style="background:var(--bg);padding:0 12px;position:relative;z-index:1">or paste a URL</span>
+    <div style="position:absolute;top:50%;left:0;right:0;height:1px;background:var(--border)"></div>
+  </div>
+  <div style="display:flex;gap:10px;margin-bottom:20px">
+    <input type="text" id="urlInput" placeholder="YouTube, Loom, Google Drive, or any direct video URL..." style="flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:14px;outline:none;font-family:'Space Grotesk',sans-serif;transition:border-color .2s" onfocus="this.style.borderColor='var(--violet)'" onblur="this.style.borderColor='var(--border)'"/>
+    <button onclick="handleUrl()" style="padding:12px 18px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--muted);font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;font-family:'Space Grotesk',sans-serif;transition:all .15s" onmouseover="this.style.borderColor='var(--violet)';this.style.color='var(--violet)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">Use URL</button>
+  </div>
+
+  <div class="settings-card">
+    <div class="sc-title">Processing Settings</div>
+    <div class="setting-row">
+      <div><div class="sr-label">Clip Length</div><div class="sr-sub">Duration of each clip</div></div>
+      <div class="sr-control">
+        <select id="clipLen">
+          <option value="30">30 seconds</option>
+          <option value="45" selected>45 seconds</option>
+          <option value="60">60 seconds</option>
+          <option value="90">90 seconds</option>
+        </select>
+      </div>
+    </div>
+    <div class="setting-row">
+      <div><div class="sr-label">Number of Clips</div><div class="sr-sub">How many clips to generate</div></div>
+      <div class="sr-control">
+        <select id="clipCount">
+          <option value="3">3 clips</option>
+          <option value="5" selected>5 clips</option>
+          <option value="8">8 clips</option>
+        </select>
+      </div>
+    </div>
+    <div class="setting-row">
+      <div><div class="sr-label">Platform</div><div class="sr-sub">Optimise captions for</div></div>
+      <div class="sr-control">
+        <select id="platform">
+          <option>Instagram Reels</option>
+          <option>YouTube Shorts</option>
+          <option>TikTok</option>
+          <option>LinkedIn</option>
+        </select>
+      </div>
+    </div>
+    <div class="setting-row">
+      <div><div class="sr-label">Auto Hashtags</div></div>
+      <div class="sr-control"><button class="toggle on" id="hashToggle" onclick="this.classList.toggle('on')"></button></div>
+    </div>
+    <div class="setting-row">
+      <div><div class="sr-label">Hook Detection</div></div>
+      <div class="sr-control"><button class="toggle on" id="hookToggle" onclick="this.classList.toggle('on')"></button></div>
+    </div>
+  </div>
+
+  <button class="process-btn" id="processBtn" onclick="startProcess()">Generate Real Clips →</button>
+
+  <div class="progress-card" id="progressCard">
+    <div class="progress-title">Processing your video...</div>
+    <div class="prog-step" id="step1"><div class="prog-dot" id="s1">1</div><div>Uploading video to server</div></div>
+    <div class="prog-step" id="step2"><div class="prog-dot" id="s2">2</div><div>Transcribing audio with Groq Whisper</div></div>
+    <div class="prog-step" id="step3"><div class="prog-dot" id="s3">3</div><div>AI finding best moments with LLaMA 3.3 70B</div></div>
+    <div class="prog-step" id="step4"><div class="prog-dot" id="s4">4</div><div>Cutting clips with ffmpeg</div></div>
+    <div class="prog-step" id="step5"><div class="prog-dot" id="s5">5</div><div>Generating thumbnails</div></div>
+    <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+    <div class="prog-note" id="progNote">Starting...</div>
+  </div>
+</div>
+
+<script>
+var BACKEND = 'http://localhost:3001';
+var selectedFile = null;
+var selectedUrl = null;
+
+function handleUrl(){
+  var url = document.getElementById('urlInput').value.trim();
+  if(!url){ showToast('Please enter a URL'); return; }
+  selectedUrl = url;
+  selectedFile = null;
+  document.getElementById('uploadZone').classList.add('has-file');
+  document.getElementById('uzIcon').textContent = '\u{1F517}';
+  document.getElementById('uzTitle').textContent = 'URL ready';
+  document.getElementById('uzFile').textContent = url.substring(0,60)+(url.length>60?'...':'');
+  showToast('URL set — click Generate Clips', 'success');
+}
+
+function handleFile(file) {
+  if (!file) return;
+  selectedFile = file;
+  document.getElementById('uploadZone').classList.add('has-file');
+  document.getElementById('uzIcon').textContent = '✅';
+  document.getElementById('uzTitle').textContent = file.name;
+  document.getElementById('uzFile').textContent = Math.round(file.size/1024/1024*10)/10 + ' MB · ' + file.type;
+}
+
+var zone = document.getElementById('uploadZone');
+zone.addEventListener('dragover', function(e){e.preventDefault();zone.classList.add('drag');});
+zone.addEventListener('dragleave', function(){zone.classList.remove('drag');});
+zone.addEventListener('drop', function(e){
+  e.preventDefault(); zone.classList.remove('drag');
+  if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+});
+
+function setStep(n, state) {
+  var dot = document.getElementById('s'+n);
+  var step = document.getElementById('step'+n);
+  dot.className = 'prog-dot';
+  step.className = 'prog-step';
+  if (state === 'done') { dot.classList.add('done'); dot.textContent = '✓'; }
+  else if (state === 'active') { dot.classList.add('active'); step.classList.add('active-step'); }
+}
+
+function setProgress(pct, note) {
+  document.getElementById('progFill').style.width = pct + '%';
+  if (note) document.getElementById('progNote').textContent = note;
+}
+
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type === 'success' ? ' success' : '');
+  setTimeout(function(){ t.classList.remove('show'); }, 4000);
+}
+
+async function startProcess() {
+  if (!selectedFile && !selectedUrl) { showToast('Please select a file or paste a URL first'); return; }
+
+  var btn = document.getElementById('processBtn');
+  btn.disabled = true; btn.textContent = 'Processing...';
+  document.getElementById('progressCard').style.display = 'block';
+  document.getElementById('progressCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  var settings = {
+    clipLen: document.getElementById('clipLen').value,
+    clipCount: parseInt(document.getElementById('clipCount').value),
+    platform: document.getElementById('platform').value,
+    hashtags: document.getElementById('hashToggle').classList.contains('on'),
+    hooks: document.getElementById('hookToggle').classList.contains('on'),
+  };
+
+  // Step 1 — upload
+  setStep(1, 'active'); setProgress(5, 'Uploading video...');
+  var fd = new FormData();
+  fd.append('file', selectedFile);
+  fd.append('settings', JSON.stringify(settings));
+
+  try {
+    // Steps 2-5 happen server-side — we just show progress while waiting
+    var progInterval = animateProgress();
+
+    var res = await fetch(BACKEND + '/api/process', { method: 'POST', body: fd });
+
+    clearInterval(progInterval);
+
+    if (!res.ok) {
+      var err = await res.json();
+      throw new Error(err.error || 'Server error ' + res.status);
+    }
+
+    var data = await res.json();
+
+    // Mark all done
+    [1,2,3,4,5].forEach(function(n){ setStep(n,'done'); });
+    setProgress(100, 'Done! ' + data.clips.length + ' clips generated.');
+
+    // Save result
+    var jobs = JSON.parse(localStorage.getItem('lumeo_jobs') || '[]');
+    jobs.push({
+      id: data.jobId,
+      name: data.videoName,
+      ts: Date.now(),
+      duration: data.duration,
+      transcript: data.transcript,
+      clips: data.clips,
+      settings: settings,
+    });
+    localStorage.setItem('lumeo_jobs', JSON.stringify(jobs));
+
+    showToast(data.clips.length + ' clips ready!', 'success');
+    setTimeout(function(){ window.location.href = 'clips.html'; }, 1200);
+
+  } catch(e) {
+    clearInterval(window._progInterval);
+    showToast('Error: ' + e.message + ' — make sure backend is running');
+    btn.disabled = false; btn.textContent = 'Generate Real Clips →';
+    setProgress(0, 'Failed — check backend terminal');
+  }
+}
+
+// Animate progress steps during server processing
+function animateProgress() {
+  var step = 1;
+  var stepTimes = [0, 1500, 4000, 8000, 12000]; // approximate ms per step
+  var notes = ['Uploading...','Transcribing with Groq Whisper...','AI analysing moments...','Cutting clips with ffmpeg...','Generating thumbnails...'];
+  var pcts = [8, 25, 50, 75, 90];
+
+  stepTimes.forEach(function(t, i) {
+    setTimeout(function(){
+      if(step <= 5){
+        if(i > 0) setStep(i, 'done');
+        setStep(i+1, 'active');
+        setProgress(pcts[i], notes[i]);
+        step++;
+      }
+    }, t);
+  });
+
+  return setInterval(function(){}, 99999); // placeholder — cleared on response
+}
+</script>
+<script src="nav.js"></script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Lumeo — Dashboard</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0a0a0f;--surface:#12121a;--card:#1a1a26;--card2:#20202e;--purple:#7c3aed;--violet:#8b5cf6;--pink:#ec4899;--cyan:#06b6d4;--green:#10b981;--text:#f1f0ff;--muted:#6b6a8a;--border:#2a2a3e;}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Space Grotesk',sans-serif}
+body{background:var(--bg);color:var(--text);min-height:100vh}
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100}
+.nav-logo{font-size:20px;font-weight:700;letter-spacing:-1px;background:linear-gradient(135deg,var(--violet),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;cursor:pointer}
+.nav-links{display:flex;gap:4px}
+.nav-links a{color:var(--muted);font-size:13px;font-weight:500;padding:6px 14px;border-radius:6px;text-decoration:none;transition:all .15s}
+.nav-links a:hover,.nav-links a.active{color:var(--violet);background:rgba(139,92,246,.08)}
+.user-dot{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--pink));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer;color:#fff}
+.app{max-width:1100px;margin:0 auto;padding:32px 20px}
+.hero{background:linear-gradient(135deg,rgba(124,58,237,.15),rgba(236,72,153,.08));border:1px solid rgba(139,92,246,.2);border-radius:20px;padding:36px;margin-bottom:28px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-60px;right:-60px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.12),transparent 70%)}
+.hero-tag{font-size:11px;color:var(--violet);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px}
+.hero-title{font-size:32px;font-weight:700;letter-spacing:-1px;margin-bottom:8px}
+.hero-title span{background:linear-gradient(135deg,var(--violet),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:14px;color:var(--muted);max-width:500px;line-height:1.7;margin-bottom:24px}
+.hero-btn{display:inline-block;padding:12px 28px;background:linear-gradient(135deg,var(--purple),var(--pink));border-radius:10px;color:#fff;font-size:14px;font-weight:600;text-decoration:none;cursor:pointer;border:none;font-family:'Space Grotesk',sans-serif;transition:opacity .2s}
+.hero-btn:hover{opacity:.85}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+.sc-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.sc-val{font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:500;margin-top:4px}
+.sc-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.purple{color:var(--violet)}.pink{color:var(--pink)}.cyan{color:var(--cyan)}.green{color:var(--green)}
+.section-title{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;font-weight:600}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px}
+.feat-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.feat-card:hover{border-color:var(--violet);transform:translateY(-2px);box-shadow:0 8px 32px rgba(124,58,237,.15)}
+.feat-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:14px}
+.fi-p{background:rgba(124,58,237,.12)}.fi-pk{background:rgba(236,72,153,.12)}.fi-c{background:rgba(6,182,212,.12)}
+.feat-title{font-size:15px;font-weight:600;margin-bottom:6px}
+.feat-desc{font-size:12px;color:var(--muted);line-height:1.6}
+.feat-arrow{position:absolute;top:20px;right:20px;color:var(--border);font-size:16px;transition:color .2s}
+.feat-card:hover .feat-arrow{color:var(--violet)}
+.recent-list{display:flex;flex-direction:column;gap:10px}
+.recent-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:16px}
+.ri-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;background:rgba(124,58,237,.1)}
+.ri-body{flex:1}
+.ri-title{font-size:13px;font-weight:500}
+.ri-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.ri-status{font-size:11px;padding:3px 9px;border-radius:4px;font-weight:600}
+.st-done{background:rgba(16,185,129,.1);color:var(--green)}
+.st-proc{background:rgba(139,92,246,.1);color:var(--violet)}
+.ri-clips{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);text-align:right}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo" onclick="window.location.href='index.html'">Lumeo</div>
+  <div class="nav-links">
+    <a href="index.html" class="active">Dashboard</a>
+    <a href="upload.html">Upload</a>
+    <a href="clips.html">My Clips</a>
+    <a href="editor.html">Editor</a>
+  </div>
+  <div class="user-dot">A</div>
+</nav>
+<div id="profileDropdown" style="display:none;position:fixed;top:60px;right:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:999;min-width:220px"></div>
+
+<div class="app">
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">AI Video Automation</div>
+    <div class="hero-title">Turn long videos into<br><span>viral short clips</span> — instantly.</div>
+    <div class="hero-sub">Upload any video. Lumeo transcribes, analyses, and generates ready-to-post short-form clips. No editing. No timeline scrubbing. Just results.</div>
+    <button class="hero-btn" onclick="window.location.href='upload.html'">Upload a video →</button>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row" id="statsRow">
+    <div class="stat-card"><div class="sc-label">Videos Processed</div><div class="sc-val purple">0</div><div class="sc-sub">Upload your first</div></div>
+    <div class="stat-card"><div class="sc-label">Clips Generated</div><div class="sc-val pink">0</div><div class="sc-sub">Ready to post</div></div>
+    <div class="stat-card"><div class="sc-label">Hours Saved</div><div class="sc-val cyan">0</div><div class="sc-sub">vs manual editing</div></div>
+    <div class="stat-card"><div class="sc-label">Avg Clip Length</div><div class="sc-val green">—</div><div class="sc-sub">seconds</div></div>
+  </div>
+
+  <!-- FEATURES -->
+  <div class="section-title">What Lumeo does</div>
+  <div class="feat-grid">
+    <div class="feat-card" onclick="window.location.href='upload.html'">
+      <div class="feat-arrow">→</div>
+      <div class="feat-icon fi-p">🎙️</div>
+      <div class="feat-title">AI Transcription</div>
+      <div class="feat-desc">Powered by Groq Whisper. Transcribes your full video in seconds with speaker detection and timestamps.</div>
+    </div>
+    <div class="feat-card" onclick="window.location.href='clips.html'">
+      <div class="feat-arrow">→</div>
+      <div class="feat-icon fi-pk">✂️</div>
+      <div class="feat-title">Clip Generator</div>
+      <div class="feat-desc">LLaMA 3.3 70B finds the highest-value moments — hooks, insights, punchlines — and turns them into clips with captions.</div>
+    </div>
+    <div class="feat-card" onclick="window.location.href='editor.html'">
+      <div class="feat-arrow">→</div>
+      <div class="feat-icon fi-c">🎬</div>
+      <div class="feat-title">Caption Editor</div>
+      <div class="feat-desc">Review and edit AI-generated captions, titles, and hashtags for each clip before exporting to any platform.</div>
+    </div>
+  </div>
+
+  <!-- RECENT -->
+  <div class="section-title">Recent Activity</div>
+  <div class="recent-list" id="recentList">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:32px;text-align:center;color:var(--muted);font-size:13px">
+      No videos yet — <a href="upload.html" style="color:var(--violet);text-decoration:none">upload your first one →</a>
+    </div>
+  </div>
+</div>
+
+<script>
+// Load stats and recent from localStorage
+function loadDashboard(){
+  var jobs=JSON.parse(localStorage.getItem('lumeo_jobs')||'[]');
+  if(jobs.length===0) return;
+  var totalClips=jobs.reduce(function(a,j){return a+(j.clips?j.clips.length:0);},0);
+  var sr=document.getElementById('statsRow');
+  sr.innerHTML=
+    '<div class="stat-card"><div class="sc-label">Videos Processed</div><div class="sc-val purple">'+jobs.length+'</div><div class="sc-sub">Total uploads</div></div>'+
+    '<div class="stat-card"><div class="sc-label">Clips Generated</div><div class="sc-val pink">'+totalClips+'</div><div class="sc-sub">Ready to post</div></div>'+
+    '<div class="stat-card"><div class="sc-label">Hours Saved</div><div class="sc-val cyan">'+(jobs.length*2)+'</div><div class="sc-sub">vs manual editing</div></div>'+
+    '<div class="stat-card"><div class="sc-label">Avg Clip Length</div><div class="sc-val green">45</div><div class="sc-sub">seconds</div></div>';
+  var rl=document.getElementById('recentList');
+  rl.innerHTML=jobs.slice(-4).reverse().map(function(j){
+    return '<div class="recent-item" onclick="window.location.href=\'clips.html\'">'+
+      '<div class="ri-icon">🎥</div>'+
+      '<div class="ri-body"><div class="ri-title">'+j.name+'</div><div class="ri-sub">'+new Date(j.ts).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})+'</div></div>'+
+      '<div style="text-align:right"><div class="ri-status st-done">Done</div><div class="ri-clips" style="margin-top:4px">'+(j.clips?j.clips.length:0)+' clips</div></div>'+
+    '</div>';
+  }).join('');
+}
+loadDashboard();
+</script>
+<script src="nav.js"></script>
+</body>
+</html>

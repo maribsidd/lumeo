@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Notebook — Lumeo</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0a0a0f;--surface:#12121a;--card:#1a1a26;--card2:#20202e;--purple:#7c3aed;--violet:#8b5cf6;--pink:#ec4899;--cyan:#06b6d4;--green:#10b981;--red:#ef4444;--text:#f1f0ff;--muted:#6b6a8a;--border:#2a2a3e;}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Space Grotesk',sans-serif}
+body{background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;flex-shrink:0}
+.nav-logo{font-size:20px;font-weight:700;letter-spacing:-1px;background:linear-gradient(135deg,var(--violet),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;cursor:pointer}
+.nav-links{display:flex;gap:4px}
+.nav-links a{color:var(--muted);font-size:13px;font-weight:500;padding:6px 14px;border-radius:6px;text-decoration:none;transition:all .15s}
+.nav-links a:hover,.nav-links a.active{color:var(--violet);background:rgba(139,92,246,.08)}
+.user-dot{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--pink));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer;color:#fff}
+.layout{display:grid;grid-template-columns:280px 1fr;flex:1;overflow:hidden;height:calc(100vh - 56px)}
+
+/* SIDEBAR */
+.sidebar{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.sb-head{padding:16px;border-bottom:1px solid var(--border)}
+.sb-head h3{font-size:14px;font-weight:600;margin-bottom:12px}
+.sb-search{width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;outline:none;font-family:'Space Grotesk',sans-serif}
+.sb-search:focus{border-color:var(--violet)}
+.sb-search::placeholder{color:var(--muted)}
+.sb-list{flex:1;overflow-y:auto;padding:8px}
+.sb-list::-webkit-scrollbar{width:4px}
+.sb-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.video-item{padding:10px 12px;border-radius:8px;cursor:pointer;transition:background .15s;border:1px solid transparent;margin-bottom:4px}
+.video-item:hover{background:var(--card)}
+.video-item.active{background:rgba(124,58,237,.1);border-color:rgba(124,58,237,.2)}
+.vi-name{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vi-meta{font-size:11px;color:var(--muted);margin-top:3px}
+.vi-clips{font-size:10px;color:var(--violet);margin-top:2px}
+.empty-sb{padding:20px;text-align:center;color:var(--muted);font-size:12px}
+
+/* MAIN */
+.main{display:flex;flex-direction:column;overflow:hidden}
+.main-head{padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0}
+.mh-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.mh-icon{width:36px;height:36px;border-radius:8px;background:rgba(6,182,212,.1);display:flex;align-items:center;justify-content:center;font-size:16px}
+.mh-title{font-size:16px;font-weight:600}
+.mh-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.chip-row{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:6px 14px;border-radius:20px;border:1px solid var(--border);font-size:12px;color:var(--muted);cursor:pointer;transition:all .15s;font-weight:500}
+.chip:hover{border-color:var(--violet);color:var(--violet)}
+.chip.active{background:rgba(124,58,237,.1);border-color:var(--violet);color:var(--violet)}
+
+/* CONTENT AREA */
+.content-area{flex:1;overflow-y:auto;padding:20px}
+.content-area::-webkit-scrollbar{width:4px}
+.content-area::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* CARDS */
+.nb-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px}
+.nc-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.nc-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.nc-icon.p{background:rgba(124,58,237,.1)}
+.nc-icon.c{background:rgba(6,182,212,.1)}
+.nc-icon.g{background:rgba(16,185,129,.1)}
+.nc-icon.y{background:rgba(245,158,11,.1)}
+.nc-title{font-size:14px;font-weight:600}
+.nc-body{font-size:13px;color:var(--muted);line-height:1.8}
+.nc-body strong{color:var(--text)}
+.quote-block{background:var(--card2);border-left:3px solid var(--violet);border-radius:0 8px 8px 0;padding:12px 16px;margin:10px 0;font-size:13px;color:var(--text);font-style:italic;line-height:1.7}
+.chapter-list{display:flex;flex-direction:column;gap:8px}
+.chapter-item{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--card2);border-radius:8px;cursor:pointer;transition:background .15s}
+.chapter-item:hover{background:rgba(124,58,237,.08)}
+.ch-time{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--violet);flex-shrink:0;width:45px}
+.ch-title{font-size:13px;color:var(--text);font-weight:500}
+.ch-desc{font-size:11px;color:var(--muted);margin-top:2px}
+.key-points{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kp{background:var(--card2);border-radius:8px;padding:12px;font-size:12px;color:var(--muted);line-height:1.6;border-left:2px solid var(--violet)}
+.kp strong{color:var(--text);display:block;margin-bottom:4px;font-size:13px}
+.tag-cloud{display:flex;flex-wrap:wrap;gap:8px}
+.topic-tag{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:default}
+.tt-p{background:rgba(124,58,237,.1);color:var(--violet)}
+.tt-c{background:rgba(6,182,212,.1);color:var(--cyan)}
+.tt-g{background:rgba(16,185,129,.1);color:var(--green)}
+.tt-y{background:rgba(245,158,11,.1);color:#f59e0b}
+
+/* CHAT */
+.chat-area{border-top:1px solid var(--border);flex-shrink:0}
+.chat-messages{max-height:200px;overflow-y:auto;padding:12px 20px;display:flex;flex-direction:column;gap:10px}
+.chat-messages::-webkit-scrollbar{width:4px}
+.chat-messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.cmsg{max-width:80%}
+.cmsg.user{align-self:flex-end}
+.cmsg.ai{align-self:flex-start}
+.cmsg-bubble{padding:10px 14px;border-radius:10px;font-size:13px;line-height:1.6}
+.cmsg.user .cmsg-bubble{background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.25);border-radius:10px 10px 4px 10px}
+.cmsg.ai .cmsg-bubble{background:var(--card);border:1px solid var(--border);border-radius:10px 10px 10px 4px;color:var(--text)}
+.chat-input-wrap{padding:12px 20px;display:flex;gap:10px}
+.chat-input-wrap input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:13px;outline:none;transition:border-color .2s;font-family:'Space Grotesk',sans-serif}
+.chat-input-wrap input:focus{border-color:var(--violet)}
+.chat-input-wrap input::placeholder{color:var(--muted)}
+.send-btn{width:38px;height:38px;border-radius:8px;background:linear-gradient(135deg,var(--purple),var(--pink));border:none;cursor:pointer;color:#fff;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.send-btn:disabled{background:var(--border);cursor:default}
+.typing{display:flex;gap:4px;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:10px 10px 10px 4px;width:52px}
+.typing span{width:5px;height:5px;border-radius:50%;background:var(--muted)}
+.typing span:nth-child(1){animation:td .8s infinite 0s}
+.typing span:nth-child(2){animation:td .8s infinite .15s}
+.typing span:nth-child(3){animation:td .8s infinite .3s}
+@keyframes td{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
+.no-video{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--muted);text-align:center;padding:40px}
+.no-video .nv-icon{font-size:48px;margin-bottom:16px}
+.no-video p{font-size:14px;margin-bottom:20px}
+.no-video a{color:var(--violet);text-decoration:none}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo" onclick="window.location.href='index.html'">Lumeo</div>
+  <div class="nav-links">
+    <a href="index.html">Dashboard</a>
+    <a href="upload.html">Upload</a>
+    <a href="clips.html">My Clips</a>
+    <a href="editor.html">Editor</a>
+    <a href="notebook.html" class="active">Notebook</a>
+    <a href="studio.html">Studio</a>
+  </div>
+  <div class="user-dot">A</div>
+</nav>
+<div id="profileDropdown" style="display:none;position:fixed;top:60px;right:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:999;min-width:220px"></div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-head">
+      <h3>Your Videos</h3>
+      <input class="sb-search" type="text" placeholder="Search videos..." id="sbSearch" oninput="filterVideos(this.value)"/>
+    </div>
+    <div class="sb-list" id="sbList"></div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div id="mainArea"></div>
+  </div>
+</div>
+
+<script>
+var BACKEND = 'http://localhost:3001';
+var jobs = JSON.parse(localStorage.getItem('lumeo_jobs') || '[]');
+var currentJob = null;
+var activeTab = 'summary';
+var chatHistory = [];
+var busy = false;
+
+function renderSidebar(filter) {
+  var list = document.getElementById('sbList');
+  var filtered = filter ? jobs.filter(function(j){ return j.name.toLowerCase().includes(filter.toLowerCase()); }) : jobs;
+  if(filtered.length === 0){
+    list.innerHTML = '<div class="empty-sb">' + (jobs.length === 0 ? 'No videos yet.<br><a href="upload.html" style="color:var(--violet)">Upload one →</a>' : 'No results.') + '</div>';
+    return;
+  }
+  list.innerHTML = filtered.map(function(j){
+    var active = currentJob && currentJob.id === j.id;
+    return '<div class="video-item '+(active?'active':'')+'" onclick="selectJob('+j.id+')">'+
+      '<div class="vi-name">'+escHtml(j.name.substring(0,35))+'</div>'+
+      '<div class="vi-meta">'+new Date(j.ts).toLocaleDateString('en-IN',{day:'numeric',month:'short'})+(j.duration?' · '+fmtDur(j.duration):'')+'</div>'+
+      '<div class="vi-clips">'+(j.clips?j.clips.length:0)+' clips generated</div>'+
+    '</div>';
+  }).join('');
+}
+
+function filterVideos(q){ renderSidebar(q); }
+
+function selectJob(id){
+  currentJob = jobs.find(function(j){ return j.id===id; });
+  chatHistory = [];
+  renderSidebar(document.getElementById('sbSearch').value);
+  renderMain();
+}
+
+function setTab(tab){
+  activeTab = tab;
+  document.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('active'); });
+  document.querySelector('[data-tab="'+tab+'"]').classList.add('active');
+  renderContent();
+}
+
+function renderMain(){
+  var ma = document.getElementById('mainArea');
+  if(!currentJob){
+    ma.innerHTML = '<div class="main-head"><div class="mh-top"><div class="mh-icon">📓</div><div><div class="mh-title">Notebook</div><div class="mh-sub">AI-powered deep analysis of your videos</div></div></div></div>'+
+      '<div style="display:flex;align-items:center;justify-content:center;height:calc(100vh - 200px)"><div class="no-video"><div class="nv-icon">📓</div><p>Select a video from the left to see its full AI analysis — chapters, key quotes, topics, and more.</p><a href="upload.html">Upload a video first →</a></div></div>';
+    return;
+  }
+
+  ma.innerHTML =
+    '<div class="main-head">'+
+      '<div class="mh-top">'+
+        '<div class="mh-icon">🎬</div>'+
+        '<div><div class="mh-title">'+escHtml(currentJob.name)+'</div>'+
+        '<div class="mh-sub">'+(currentJob.duration?fmtDur(currentJob.duration)+' · ':'')+currentJob.clips.length+' clips · '+(currentJob.overallStyle||'AI Analysed')+'</div></div>'+
+      '</div>'+
+      '<div class="chip-row">'+
+        '<div class="chip active" data-tab="summary" onclick="setTab(\'summary\')">Summary</div>'+
+        '<div class="chip" data-tab="chapters" onclick="setTab(\'chapters\')">Chapters</div>'+
+        '<div class="chip" data-tab="quotes" onclick="setTab(\'quotes\')">Key Quotes</div>'+
+        '<div class="chip" data-tab="topics" onclick="setTab(\'topics\')">Topics</div>'+
+        '<div class="chip" data-tab="shownotes" onclick="setTab(\'shownotes\')">Show Notes</div>'+
+      '</div>'+
+    '</div>'+
+    '<div style="display:flex;flex-direction:column;height:calc(100vh - 190px)">'+
+      '<div class="content-area" id="contentArea"></div>'+
+      '<div class="chat-area">'+
+        '<div class="chat-messages" id="chatMessages"></div>'+
+        '<div class="chat-input-wrap">'+
+          '<input type="text" id="chatIn" placeholder="Ask anything about this video..." onkeydown="if(event.key===\'Enter\')sendChat()"/>'+
+          '<button class="send-btn" id="sendBtn" onclick="sendChat()">↑</button>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+
+  renderContent();
+}
+
+function renderContent(){
+  var ca = document.getElementById('contentArea');
+  if(!ca||!currentJob) return;
+  var transcript = currentJob.transcript || '';
+  var clips = currentJob.clips || [];
+
+  if(activeTab === 'summary'){
+    var keyPoints = clips.slice(0,4).map(function(c,i){
+      return '<div class="kp"><strong>'+(i+1)+'. '+escHtml(c.title)+'</strong>'+escHtml(c.caption.substring(0,80))+'...</div>';
+    }).join('');
+    ca.innerHTML =
+      '<div class="nb-card">'+
+        '<div class="nc-head"><div class="nc-icon p">📋</div><div class="nc-title">Video Summary</div></div>'+
+        '<div class="nc-body">'+escHtml(transcript.substring(0,300))+(transcript.length>300?'...':'')+'<br><br>'+
+        '<strong>'+clips.length+' viral moments identified</strong> using LLaMA 3.3 70B analysis. '+
+        'AI selected the '+(currentJob.overallStyle||'optimal')+' thumbnail style for maximum engagement.</div>'+
+      '</div>'+
+      '<div class="nb-card">'+
+        '<div class="nc-head"><div class="nc-icon g">💡</div><div class="nc-title">Key Moments</div></div>'+
+        '<div class="key-points">'+keyPoints+'</div>'+
+      '</div>'+
+      '<div class="nb-card">'+
+        '<div class="nc-head"><div class="nc-icon c">📊</div><div class="nc-title">Clip Performance Scores</div></div>'+
+        '<div class="nc-body">'+clips.map(function(c){
+          var bar = Math.round(c.score||70);
+          return '<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--text)">'+escHtml(c.title.substring(0,40))+'</span><span style="color:var(--violet);font-family:IBM Plex Mono,monospace">'+bar+'/100</span></div>'+
+          '<div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+bar+'%;background:linear-gradient(90deg,var(--purple),var(--pink));border-radius:2px"></div></div></div>';
+        }).join('')+'</div>'+
+      '</div>';
+
+  } else if(activeTab === 'chapters'){
+    var chaps = clips.map(function(c,i){
+      return '<div class="chapter-item" onclick="window.location.href=\'clips.html\'">'+
+        '<div class="ch-time">'+fmtTime(c.start||0)+'</div>'+
+        '<div><div class="ch-title">'+escHtml(c.title)+'</div><div class="ch-desc">'+escHtml((c.caption||'').substring(0,60))+'...</div></div>'+
+      '</div>';
+    }).join('');
+    ca.innerHTML =
+      '<div class="nb-card">'+
+        '<div class="nc-head"><div class="nc-icon y">📑</div><div class="nc-title">Auto-Generated Chapters</div></div>'+
+        '<div class="chapter-list">'+chaps+'</div>'+
+      '</div>';
+
+  } else if(activeTab === 'quotes'){
+    var quotes = clips.slice(0,5).map(function(c){
+      return '<div class="quote-block">"'+escHtml(c.caption.split('.')[0]+'.'"')+'<div style="font-size:11px;color:var(--muted);margin-top:6px;font-style:normal">— from clip at '+fmtTime(c.start||0)+'</div></div>';
+    }).join('');
+    ca.innerHTML =
+      '<div class="nb-card">'+
+        '<div class="nc-head"><div class="nc-icon p">💬</div><div class="nc-title">Key Quotes & Moments</div></div>'+
+        '<div class="nc-body">'+quotes+'</div>'+
+      '</div>';
+
+  } else if(activeTab === 'topics'){
+    var tags = [];
+    clips.forEach(function(c){
+      (c.hashtags||'').split(' ').filter(function(t){return t.startsWith('#');}).forEach(function(t){
+        if(!tags.includes(t)) tags.push(t);
+      });
+    });
+    var colors = ['tt-p','tt-c','tt-g','tt-y'];
+    var tagHtml = tags.slice(0,20).map(function(t,i){
+      return '<span class="topic-tag '+colors[i%4]+'">'+escHtml(t)+'</span>';
+    }).join('');
+    ca.innerHTML =
+      '<div class="nb-card">'+
+        '<div class="nc-head"><div class="nc-icon c">🏷️</div><div class="nc-title">Topics & Keywords</div></div>'+
+        '<div class="tag-cloud">'+tagHtml+'</div>'+
+      '</div>'+
+      '<div class="nb-card">'+
+        '<div class="nc-head"><div class="nc-icon g">🎯</div><div class="nc-title">Detected Emotions</div></div>'+
+        '<div class="nc-body">'+clips.map(function(c){
+          return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><span style="font-size:16px">'+emotionEmoji(c.emotion)+'</span><span style="font-size:13px;color:var(--text)">'+escHtml(c.title.substring(0,40))+'</span><span style="font-size:11px;color:var(--muted);margin-left:auto">'+escHtml(c.emotion||'neutral')+'</span></div>';
+        }).join('')+'</div>'+
+      '</div>';
+
+  } else if(activeTab === 'shownotes'){
+    var notes = '## '+escHtml(currentJob.name)+'\n\n';
+    notes += '**Duration:** '+(currentJob.duration?fmtDur(currentJob.duration):'Unknown')+'\n';
+    notes += '**Clips Generated:** '+clips.length+'\n\n';
+    notes += '### Chapters\n\n';
+    clips.forEach(function(c){ notes += '- **['+fmtTime(c.start||0)+'](#)** '+c.title+'\n'; });
+    notes += '\n### Description\n\n';
+    notes += (currentJob.transcript||'').substring(0,300)+'...\n\n';
+    notes += '### Hashtags\n\n';
+    var allTags = [];
+    clips.forEach(function(c){ (c.hashtags||'').split(' ').filter(function(t){return t.startsWith('#');}).forEach(function(t){ if(!allTags.includes(t)) allTags.push(t); }); });
+    notes += allTags.slice(0,12).join(' ');
+
+    ca.innerHTML =
+      '<div class="nb-card">'+
+        '<div class="nc-head" style="justify-content:space-between">'+
+          '<div style="display:flex;align-items:center;gap:10px"><div class="nc-icon g">📝</div><div class="nc-title">Show Notes</div></div>'+
+          '<button onclick="copyShowNotes()" style="padding:6px 14px;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.3);border-radius:6px;color:var(--violet);font-size:12px;cursor:pointer;font-family:Space Grotesk,sans-serif">Copy All</button>'+
+        '</div>'+
+        '<pre id="showNotesText" style="font-family:IBM Plex Mono,monospace;font-size:12px;color:var(--muted);line-height:1.8;white-space:pre-wrap;background:var(--card2);padding:16px;border-radius:8px">'+escHtml(notes)+'</pre>'+
+      '</div>';
+  }
+}
+
+async function sendChat(){
+  var inp = document.getElementById('chatIn');
+  var q = inp.value.trim();
+  if(!q||busy||!currentJob) return;
+  inp.value=''; busy=true;
+  document.getElementById('sendBtn').disabled=true;
+
+  appendChatMsg('user', q);
+  chatHistory.push({role:'user',content:q});
+
+  // Typing indicator
+  var typingDiv = document.createElement('div');
+  typingDiv.className='cmsg ai'; typingDiv.id='typing';
+  typingDiv.innerHTML='<div class="typing"><span></span><span></span><span></span></div>';
+  document.getElementById('chatMessages').appendChild(typingDiv);
+  scrollChat();
+
+  try {
+    var context = 'Video: '+currentJob.name+'\nTranscript: '+((currentJob.transcript||'').substring(0,1500))+
+      '\nClips: '+currentJob.clips.map(function(c){return c.title+' ('+fmtTime(c.start)+')';}).join(', ');
+
+    var res = await fetch(BACKEND+'/api/notebook', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({messages:chatHistory, context})
+    });
+    document.getElementById('typing')?.remove();
+
+    var data = await res.json();
+    var reply = (data.content&&data.content[0]&&data.content[0].text) ? data.content[0].text : 'Could not get a response.';
+    chatHistory.push({role:'assistant',content:reply});
+    appendChatMsg('ai', reply);
+  } catch(e) {
+    document.getElementById('typing')?.remove();
+    appendChatMsg('ai', 'Backend offline — run: cd backend → node server.js');
+  }
+  busy=false; document.getElementById('sendBtn').disabled=false;
+}
+
+function appendChatMsg(role, text){
+  var cm = document.getElementById('chatMessages');
+  var d = document.createElement('div');
+  d.className='cmsg '+role;
+  d.innerHTML='<div class="cmsg-bubble">'+escHtml(text)+'</div>';
+  cm.appendChild(d);
+  scrollChat();
+}
+function scrollChat(){ var cm=document.getElementById('chatMessages'); if(cm) cm.scrollTop=cm.scrollHeight; }
+function copyShowNotes(){ var el=document.getElementById('showNotesText'); if(el) navigator.clipboard.writeText(el.textContent); }
+function fmtTime(s){var m=Math.floor(s/60);var sec=Math.round(s%60);return m+':'+(sec<10?'0':'')+sec;}
+function fmtDur(s){var m=Math.floor(s/60);var sec=Math.round(s%60);return m+'m '+sec+'s';}
+function escHtml(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function emotionEmoji(e){ return {shock:'😮',curiosity:'🤔',inspiration:'✨',humour:'😄',authority:'💼',surprise:'😲'}[e]||'💡'; }
+
+// Init
+renderSidebar();
+if(jobs.length > 0){ currentJob=jobs[jobs.length-1]; renderSidebar(); renderMain(); }
+else renderMain();
+</script>
+<script src="nav.js"></script>
+</body>
+</html>
