@@ -4,7 +4,7 @@ const Groq = require('groq-sdk');
 const ffmpeg = require('fluent-ffmpeg');
 const fs = require('fs');
 const path = require('path');
-const { generateThumbnail, pickStyle, STYLES } = require('./thumbnail');
+const { pickStyle, STYLES } = require('./thumbnail');
 
 const client = new Groq({ apiKey: process.env.GROQ_API_KEY });
 const OUT = path.join(__dirname, '..', 'outputs');
@@ -100,11 +100,7 @@ module.exports = function(upload) {
           if(fs.existsSync(clipPath)) { clipUrl = `/outputs/${clipFile}`; console.log(`[Lumeo] Clip ${clip.id} cut OK`); }
         } catch(e) { console.error(`[Lumeo] Clip ${clip.id} cut error:`, e.message); }
 
-        const thumbTitle = clip.thumbnail_text || clip.title;
-        const thumbResult = await generateThumbnail(jobId, clip.id, thumbTitle, transcript);
-        console.log(`[Lumeo] Thumb ${clip.id} OK — ${thumbResult.styleUsed}`);
-
-        results.push({...clip, start, end:start+parseInt(clipLen), clipUrl, thumbUrl:thumbResult.thumbUrl, thumbnailStyle:thumbResult.styleUsed, thumbnailStyleKey:thumbResult.styleKey});
+        results.push({...clip, start, end:start+parseInt(clipLen), clipUrl, thumbUrl:null, thumbnailStyle:STYLES[overallStyle].name, thumbnailStyleKey:overallStyle, thumbnail_text:clip.thumbnail_text||clip.title});
       }
 
       try { fs.unlinkSync(srcPath); } catch(e) {}

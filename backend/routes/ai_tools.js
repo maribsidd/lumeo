@@ -71,3 +71,66 @@ router.post('/improve', async (req, res) => {
 });
 
 module.exports = router;
+
+// THUMBNAIL PROMPT GENERATOR — returns AI prompt + Pollinations URL
+// Frontend generates the thumbnail directly, no server timeout issue
+router.post('/thumbnail/prompt', async (req, res) => {
+  const { title, transcript, styleOverride } = req.body;
+  if (!title) return res.status(400).json({ error: 'title required' });
+
+  const { pickStyle, STYLES } = require('./thumbnail');
+  const styleKey = styleOverride || pickStyle(transcript || title, title);
+  const style = STYLES[styleKey];
+
+  const prompt = [
+    `YouTube thumbnail ${style.name} style,`,
+    `video about: "${title.substring(0,60)}",`,
+    style.subject + ',',
+    style.bg + ',',
+    style.style + ',',
+    `colors: ${style.colors},`,
+    `photorealistic 4K cinematic NO TEXT no words no letters no watermarks`,
+  ].join(' ');
+
+  const seed = Math.floor(Math.random() * 99999);
+  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1280&height=720&seed=${seed}&nologo=true&enhance=true&model=flux`;
+
+  res.json({ url, styleKey, styleName: style.name, prompt, seed });
+});
+
+// CAPTION GENERATOR — for existing short clips
+router.post('/studio/captions', async (req, res) => {
+  const { description, platform, niche } = req.body;
+  if (!description) return res.status(400).json({ error: 'description required' });
+  try {
+    const resp = await client.chat.completions.create({
+      model: 'llama-3.3-70b-versatile', max_tokens: 1500, temperature: 0.85,
+      messages: [{ role: 'user', content:
+        `You are a viral content strategist. Generate captions for this short video clip.
+
+Platform: ${platform}
+Niche: ${niche}
+Clip description: "${description}"
+
+Return ONLY JSON (no markdown):
+{
+  "titles": [
+    {"style":"Curiosity Gap","text":"title max 60 chars","score":88},
+    {"style":"How-To","text":"title max 60 chars","score":82},
+    {"style":"Emotional","text":"title max 60 chars","score":85},
+    {"style":"Number","text":"title max 60 chars","score":80}
+  ],
+  "captions": [
+    {"platform":"${platform}","text":"ready-to-post caption 2-3 sentences native tone strong hook CTA at end"},
+    {"platform":"Instagram Story","text":"shorter punchier version for story"},
+    {"platform":"Twitter/X","text":"under 280 chars punchy version"}
+  ],
+  "hashtags": ["#tag1","#tag2","#tag3","#tag4","#tag5","#tag6","#tag7","#tag8","#tag9","#tag10","#tag11","#tag12","#tag13","#tag14","#tag15","#tag16","#tag17","#tag18","#tag19","#tag20"]
+}`
+      }]
+    });
+    let text = resp.choices[0].message.content.trim().replace(/```json|```/g,'').trim();
+    const match = text.match(/\{[\s\S]*\}/); if(match) text=match[0];
+    res.json(JSON.parse(text));
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});

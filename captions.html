@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Captions — Lumeo</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0a0a0f;--surface:#12121a;--card:#1a1a26;--card2:#20202e;--purple:#7c3aed;--violet:#8b5cf6;--pink:#ec4899;--cyan:#06b6d4;--green:#10b981;--red:#ef4444;--gold:#f59e0b;--text:#f1f0ff;--muted:#6b6a8a;--border:#2a2a3e;}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Space Grotesk',sans-serif}
+body{background:var(--bg);color:var(--text);min-height:100vh}
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100}
+.nav-logo{font-size:20px;font-weight:700;letter-spacing:-1px;background:linear-gradient(135deg,var(--violet),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;cursor:pointer}
+.nav-links{display:flex;gap:4px}
+.nav-links a{color:var(--muted);font-size:13px;font-weight:500;padding:6px 14px;border-radius:6px;text-decoration:none;transition:all .15s}
+.nav-links a:hover,.nav-links a.active{color:var(--violet);background:rgba(139,92,246,.08)}
+.user-dot{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--pink));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer;color:#fff}
+.page{max-width:900px;margin:0 auto;padding:28px 20px}
+.page-head{margin-bottom:28px}
+.page-head h1{font-size:28px;font-weight:700;letter-spacing:-1px}
+.page-head p{font-size:14px;color:var(--muted);margin-top:6px}
+
+/* MODE TABS */
+.mode-tabs{display:flex;gap:4px;background:var(--surface);padding:4px;border-radius:12px;width:fit-content;margin-bottom:24px}
+.mode-tab{padding:9px 20px;border-radius:9px;border:none;background:none;color:var(--muted);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;font-family:'Space Grotesk',sans-serif}
+.mode-tab.active{background:var(--card2);color:var(--text)}
+
+/* INPUT CARD */
+.input-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:20px}
+.input-card h3{font-size:14px;font-weight:600;margin-bottom:16px}
+label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px}
+input,textarea,select{width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:13px;outline:none;font-family:'Space Grotesk',sans-serif;transition:border-color .2s;margin-bottom:14px}
+input:focus,textarea:focus,select:focus{border-color:var(--violet)}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+textarea{min-height:100px;resize:vertical}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.gen-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--purple),var(--pink));border:none;border-radius:10px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:opacity .2s}
+.gen-btn:hover{opacity:.85}
+.gen-btn:disabled{background:var(--border);cursor:default;opacity:1}
+
+/* RESULTS */
+.results-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;display:none}
+.rc-section{margin-bottom:22px}
+.rc-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:600;margin-bottom:10px}
+.caption-versions{display:flex;flex-direction:column;gap:10px}
+.caption-ver{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px}
+.cv-platform{font-size:10px;color:var(--violet);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.cv-text{font-size:13px;color:var(--text);line-height:1.8;white-space:pre-wrap;margin-bottom:8px}
+.cv-copy{padding:6px 14px;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.2);border-radius:6px;color:var(--violet);font-size:11px;cursor:pointer;font-family:'Space Grotesk',sans-serif;font-weight:500}
+.cv-copy:hover{background:rgba(124,58,237,.2)}
+.tags-wrap{display:flex;flex-wrap:wrap;gap:7px}
+.tag{padding:6px 13px;border-radius:20px;font-size:12px;font-weight:500;background:rgba(139,92,246,.1);color:var(--violet);cursor:pointer;transition:background .15s;border:1px solid rgba(139,92,246,.2)}
+.tag:hover{background:rgba(139,92,246,.2)}
+.tag.copied{background:rgba(16,185,129,.1);color:var(--green);border-color:rgba(16,185,129,.2)}
+.titles-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.title-item{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;position:relative;cursor:pointer;transition:border-color .15s}
+.title-item:hover{border-color:var(--violet)}
+.ti-style{font-size:10px;color:var(--violet);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.ti-text{font-size:13px;color:var(--text);font-weight:500;line-height:1.4}
+.ti-score{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--green);margin-top:5px}
+.copy-mini{position:absolute;top:8px;right:8px;padding:3px 8px;background:rgba(124,58,237,.1);border:none;border-radius:4px;color:var(--violet);font-size:10px;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+
+/* VIDEO UPLOAD ZONE */
+.video-zone{background:var(--card);border:2px dashed var(--border);border-radius:14px;padding:32px;text-align:center;cursor:pointer;transition:all .2s;position:relative;margin-bottom:14px}
+.video-zone:hover{border-color:var(--violet);background:rgba(124,58,237,.04)}
+.video-zone.has-file{border-color:var(--green);border-style:solid}
+.vz-icon{font-size:32px;margin-bottom:8px}
+.vz-title{font-size:14px;font-weight:600;margin-bottom:4px}
+.vz-sub{font-size:12px;color:var(--muted)}
+.vz-file{font-size:12px;color:var(--green);margin-top:6px;font-family:'IBM Plex Mono',monospace}
+#videoFileInput{position:absolute;inset:0;opacity:0;cursor:pointer}
+video#previewVideo{width:100%;border-radius:10px;margin-bottom:14px;display:none;max-height:240px;background:#000}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--green);color:var(--green);padding:12px 20px;border-radius:10px;font-size:13px;z-index:999;display:none}
+.toast.show{display:block}
+.dots{display:inline-flex;gap:3px;margin-left:8px}
+.dots span{width:4px;height:4px;border-radius:50%;background:var(--violet);animation:ld .6s infinite}
+.dots span:nth-child(2){animation-delay:.12s}.dots span:nth-child(3){animation-delay:.24s}
+@keyframes ld{0%,100%{opacity:.3}50%{opacity:1}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo" onclick="window.location.href='index.html'">Lumeo</div>
+  <div class="nav-links">
+    <a href="index.html">Dashboard</a>
+    <a href="upload.html">Upload</a>
+    <a href="clips.html">My Clips</a>
+    <a href="captions.html" class="active">Captions</a>
+    <a href="thumbnails.html">Thumbnails</a>
+    <a href="studio.html">Studio</a>
+  </div>
+  <div class="user-dot">A</div>
+</nav>
+<div id="profileDropdown" style="display:none;position:fixed;top:60px;right:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:999;min-width:220px"></div>
+<div class="toast" id="toast"></div>
+
+<div class="page">
+  <div class="page-head">
+    <h1>Caption Studio</h1>
+    <p>Already have a short clip? Get AI captions, titles, and hashtags instantly — no upload processing needed.</p>
+  </div>
+
+  <div class="mode-tabs">
+    <button class="mode-tab active" onclick="setMode('describe',this)">Describe your clip</button>
+    <button class="mode-tab" onclick="setMode('upload',this)">Upload clip for AI read</button>
+    <button class="mode-tab" onclick="setMode('bulk',this)">Bulk generator</button>
+  </div>
+
+  <!-- MODE: DESCRIBE -->
+  <div id="mode-describe">
+    <div class="input-card">
+      <h3>Tell us about your clip</h3>
+      <label>What happens in your clip?</label>
+      <textarea id="clipDesc" placeholder="e.g. I'm showing a 45-second clip of me making biryani from scratch. The key moment is when I add the dum — steam comes out and it looks amazing. Background is my home kitchen."></textarea>
+      <div class="row2">
+        <div>
+          <label>Platform</label>
+          <select id="platform1">
+            <option>Instagram Reels</option>
+            <option>YouTube Shorts</option>
+            <option>TikTok</option>
+            <option>LinkedIn</option>
+            <option>Twitter / X</option>
+            <option>Facebook Reels</option>
+          </select>
+        </div>
+        <div>
+          <label>Content Niche</label>
+          <select id="niche1">
+            <option>Food & Cooking</option>
+            <option>Fitness & Health</option>
+            <option>Tech & Gadgets</option>
+            <option>Finance & Business</option>
+            <option>Travel & Lifestyle</option>
+            <option>Education</option>
+            <option>Entertainment</option>
+            <option>Fashion & Beauty</option>
+            <option>Gaming</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <button class="gen-btn" id="descBtn" onclick="generateFromDesc()">Generate Captions →</button>
+    </div>
+  </div>
+
+  <!-- MODE: UPLOAD -->
+  <div id="mode-upload" style="display:none">
+    <div class="input-card">
+      <h3>Upload your short clip</h3>
+      <div class="video-zone" id="videoZone">
+        <input type="file" id="videoFileInput" accept="video/*" onchange="handleVideoUpload(this.files[0])"/>
+        <div class="vz-icon">🎬</div>
+        <div class="vz-title">Drop your clip here</div>
+        <div class="vz-sub">MP4, MOV, AVI — any short video</div>
+        <div class="vz-file" id="vzFile"></div>
+      </div>
+      <video id="previewVideo" controls></video>
+      <div class="row2">
+        <div>
+          <label>Platform</label>
+          <select id="platform2">
+            <option>Instagram Reels</option>
+            <option>YouTube Shorts</option>
+            <option>TikTok</option>
+            <option>LinkedIn</option>
+          </select>
+        </div>
+        <div>
+          <label>Your niche</label>
+          <select id="niche2">
+            <option>Food & Cooking</option>
+            <option>Fitness & Health</option>
+            <option>Tech & Gadgets</option>
+            <option>Finance & Business</option>
+            <option>Travel & Lifestyle</option>
+            <option>Education</option>
+            <option>Entertainment</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <button class="gen-btn" id="uploadBtn" onclick="generateFromUpload()">Analyse & Generate →</button>
+    </div>
+  </div>
+
+  <!-- MODE: BULK -->
+  <div id="mode-bulk" style="display:none">
+    <div class="input-card">
+      <h3>Bulk Caption Generator</h3>
+      <label>Paste multiple clip descriptions — one per line</label>
+      <textarea id="bulkInput" style="min-height:150px" placeholder="Line 1: Me making biryani at home, steam coming out of the pot&#10;Line 2: Gym workout clip, doing 100 pushups challenge&#10;Line 3: Unboxing new iPhone, first reactions and review..."></textarea>
+      <div class="row2">
+        <div>
+          <label>Platform for all</label>
+          <select id="platform3">
+            <option>Instagram Reels</option>
+            <option>YouTube Shorts</option>
+            <option>TikTok</option>
+            <option>LinkedIn</option>
+          </select>
+        </div>
+        <div>
+          <label>Niche</label>
+          <select id="niche3">
+            <option>Mixed</option>
+            <option>Food & Cooking</option>
+            <option>Fitness & Health</option>
+            <option>Tech & Gadgets</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <button class="gen-btn" id="bulkBtn" onclick="generateBulk()">Generate All →</button>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results-card" id="resultsCard">
+    <div class="rc-section">
+      <div class="rc-label">Titles</div>
+      <div class="titles-grid" id="titlesOut"></div>
+    </div>
+    <div class="rc-section">
+      <div class="rc-label">Captions by Platform</div>
+      <div class="caption-versions" id="captionsOut"></div>
+    </div>
+    <div class="rc-section">
+      <div class="rc-label">Hashtags <span style="font-size:10px;color:var(--muted);text-transform:none;letter-spacing:0">(click to copy)</span></div>
+      <div class="tags-wrap" id="tagsOut"></div>
+      <button onclick="copyAllTags()" style="margin-top:10px;padding:7px 16px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);border-radius:7px;color:var(--violet);font-size:12px;cursor:pointer;font-family:'Space Grotesk',sans-serif">Copy All Hashtags</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var BACKEND = 'http://localhost:3001';
+var uploadedVideoDesc = '';
+
+function setMode(mode, btn){
+  ['describe','upload','bulk'].forEach(function(m){
+    document.getElementById('mode-'+m).style.display = m===mode?'block':'none';
+  });
+  document.querySelectorAll('.mode-tab').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  document.getElementById('resultsCard').style.display='none';
+}
+
+function handleVideoUpload(file){
+  if(!file) return;
+  var zone = document.getElementById('videoZone');
+  zone.classList.add('has-file');
+  document.getElementById('vzFile').textContent = '✓ '+file.name;
+  var vid = document.getElementById('previewVideo');
+  vid.src = URL.createObjectURL(file);
+  vid.style.display='block';
+  uploadedVideoDesc = 'Video file: '+file.name+'. Duration: unknown. Content: visual video clip.';
+}
+
+async function callGroq(desc, platform, niche){
+  var res = await fetch(BACKEND+'/api/studio/captions',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({description:desc, platform, niche})
+  });
+  if(!res.ok) throw new Error('Server error '+res.status);
+  return await res.json();
+}
+
+async function generateFromDesc(){
+  var desc = document.getElementById('clipDesc').value.trim();
+  if(!desc){ showToast('Describe your clip first'); return; }
+  var btn = document.getElementById('descBtn');
+  btn.disabled=true; btn.innerHTML='Generating <div class="dots" style="display:inline-flex"><span></span><span></span><span></span></div>';
+  try {
+    var data = await callGroq(desc, document.getElementById('platform1').value, document.getElementById('niche1').value);
+    renderResults(data);
+  } catch(e){ showToast('Backend offline — run: cd backend → node server.js'); }
+  btn.disabled=false; btn.textContent='Generate Captions →';
+}
+
+async function generateFromUpload(){
+  var desc = uploadedVideoDesc || 'Short video clip';
+  var btn = document.getElementById('uploadBtn');
+  btn.disabled=true; btn.innerHTML='Analysing <div class="dots" style="display:inline-flex"><span></span><span></span><span></span></div>';
+  try {
+    var data = await callGroq(desc, document.getElementById('platform2').value, document.getElementById('niche2').value);
+    renderResults(data);
+  } catch(e){ showToast('Backend offline — run: cd backend → node server.js'); }
+  btn.disabled=false; btn.textContent='Analyse & Generate →';
+}
+
+async function generateBulk(){
+  var lines = document.getElementById('bulkInput').value.trim().split('\n').filter(function(l){return l.trim();});
+  if(!lines.length){ showToast('Enter at least one description'); return; }
+  var btn = document.getElementById('bulkBtn');
+  btn.disabled=true; btn.textContent='Generating '+lines.length+' captions...';
+  var platform = document.getElementById('platform3').value;
+  var niche = document.getElementById('niche3').value;
+  var allResults = [];
+  for(var i=0; i<lines.length; i++){
+    try {
+      var data = await callGroq(lines[i].replace(/^Line \d+:\s*/,''), platform, niche);
+      allResults.push({line:i+1, desc:lines[i], data});
+    } catch(e){ allResults.push({line:i+1, desc:lines[i], error:true}); }
+  }
+  // Render last result + show download option
+  if(allResults.length > 0 && !allResults[allResults.length-1].error){
+    renderResults(allResults[allResults.length-1].data);
+  }
+  // Copy all to clipboard
+  var text = allResults.map(function(r){
+    if(r.error) return 'Clip '+r.line+': [Error generating]';
+    return 'Clip '+r.line+': '+r.desc+'\nCaption: '+(r.data.captions&&r.data.captions[0]?r.data.captions[0].text:'')+ '\nHashtags: '+(r.data.hashtags||[]).join(' ')+'\n';
+  }).join('\n---\n');
+  navigator.clipboard.writeText(text).then(function(){ showToast('All '+lines.length+' captions copied to clipboard!'); });
+  btn.disabled=false; btn.textContent='Generate All →';
+}
+
+function renderResults(data){
+  document.getElementById('resultsCard').style.display='block';
+  document.getElementById('resultsCard').scrollIntoView({behavior:'smooth',block:'nearest'});
+
+  // Titles
+  var to = document.getElementById('titlesOut');
+  to.innerHTML = (data.titles||[]).map(function(t){
+    return '<div class="title-item" onclick="copyStr(\''+escAttr(t.text)+'\')">'+
+      '<div class="ti-style">'+escHtml(t.style||'Title')+'</div>'+
+      '<div class="ti-text">'+escHtml(t.text)+'</div>'+
+      '<div class="ti-score">CTR: '+(t.score||75)+'/100</div>'+
+      '<button class="copy-mini" onclick="event.stopPropagation();copyStr(\''+escAttr(t.text)+'\')">Copy</button>'+
+    '</div>';
+  }).join('');
+
+  // Captions
+  var co = document.getElementById('captionsOut');
+  co.innerHTML = (data.captions||[]).map(function(c){
+    return '<div class="caption-ver">'+
+      '<div class="cv-platform">'+escHtml(c.platform||'Caption')+'</div>'+
+      '<div class="cv-text">'+escHtml(c.text)+'</div>'+
+      '<button class="cv-copy" onclick="copyStr(\''+escAttr(c.text)+'\')">Copy</button>'+
+    '</div>';
+  }).join('');
+
+  // Tags
+  var tagsEl = document.getElementById('tagsOut');
+  tagsEl.innerHTML = (data.hashtags||[]).map(function(tag){
+    return '<span class="tag" onclick="copyTag(this,\''+escAttr(tag)+'\')">'+escHtml(tag)+'</span>';
+  }).join('');
+}
+
+function copyTag(el,tag){
+  navigator.clipboard.writeText(tag).then(function(){
+    el.classList.add('copied');el.textContent=tag+' ✓';
+    setTimeout(function(){el.classList.remove('copied');el.textContent=tag;},1500);
+  });
+}
+function copyAllTags(){
+  var tags=Array.from(document.querySelectorAll('#tagsOut .tag')).map(function(t){return t.textContent.replace(' ✓','');});
+  navigator.clipboard.writeText(tags.join(' ')).then(function(){showToast('All hashtags copied!');});
+}
+function copyStr(text){ navigator.clipboard.writeText(text).then(function(){showToast('Copied!');}); }
+function escHtml(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function escAttr(s){return(s||'').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3000);}
+</script>
+<script src="nav.js"></script>
+</body>
+</html>

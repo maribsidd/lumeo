@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Thumbnail Studio — Lumeo</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0a0a0f;--surface:#12121a;--card:#1a1a26;--card2:#20202e;--purple:#7c3aed;--violet:#8b5cf6;--pink:#ec4899;--cyan:#06b6d4;--green:#10b981;--red:#ef4444;--gold:#f59e0b;--text:#f1f0ff;--muted:#6b6a8a;--border:#2a2a3e;}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Space Grotesk',sans-serif}
+body{background:var(--bg);color:var(--text);min-height:100vh}
+nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100}
+.nav-logo{font-size:20px;font-weight:700;letter-spacing:-1px;background:linear-gradient(135deg,var(--violet),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;cursor:pointer}
+.nav-links{display:flex;gap:4px}
+.nav-links a{color:var(--muted);font-size:13px;font-weight:500;padding:6px 14px;border-radius:6px;text-decoration:none;transition:all .15s}
+.nav-links a:hover,.nav-links a.active{color:var(--violet);background:rgba(139,92,246,.08)}
+.user-dot{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--pink));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer;color:#fff}
+.page{max-width:1000px;margin:0 auto;padding:28px 20px}
+.page-head{margin-bottom:28px}
+.page-head h1{font-size:28px;font-weight:700;letter-spacing:-1px}
+.page-head p{font-size:14px;color:var(--muted);margin-top:6px}
+
+.layout{display:grid;grid-template-columns:380px 1fr;gap:20px}
+
+/* LEFT PANEL */
+.left-panel{}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:16px}
+.card h3{font-size:14px;font-weight:600;margin-bottom:14px}
+label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px}
+input,textarea,select{width:100%;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:13px;outline:none;font-family:'Space Grotesk',sans-serif;transition:border-color .2s;margin-bottom:12px}
+input:focus,textarea:focus,select:focus{border-color:var(--violet)}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+textarea{min-height:80px;resize:vertical}
+
+/* STYLE GRID */
+.style-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.style-btn{background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;cursor:pointer;transition:all .15s;text-align:left}
+.style-btn:hover{border-color:var(--violet)}
+.style-btn.active{border-color:var(--violet);background:rgba(124,58,237,.08)}
+.sb-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px}
+.sb-desc{font-size:10px;color:var(--muted)}
+.sb-example{font-size:9px;color:var(--violet);margin-top:3px}
+
+.gen-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--purple),var(--pink));border:none;border-radius:10px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:'Space Grotesk',sans-serif;transition:opacity .2s}
+.gen-btn:hover{opacity:.85}
+.gen-btn:disabled{background:var(--border);cursor:default;opacity:1}
+
+/* RIGHT PANEL - RESULTS */
+.right-panel{}
+.thumb-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.thumb-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color .2s}
+.thumb-card:hover{border-color:var(--violet)}
+.thumb-card.loading .tc-img{background:var(--card);display:flex;align-items:center;justify-content:center;height:180px;color:var(--muted);font-size:12px;flex-direction:column;gap:8px}
+.tc-img img{width:100%;height:180px;object-fit:cover;display:block}
+.tc-body{padding:12px}
+.tc-style{font-size:10px;color:var(--violet);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.tc-title{font-size:12px;color:var(--text);font-weight:500;margin-bottom:10px;line-height:1.4}
+.tc-actions{display:flex;gap:6px}
+.tc-btn{flex:1;padding:7px;border-radius:7px;font-size:11px;font-weight:500;cursor:pointer;transition:all .15s;font-family:'Space Grotesk',sans-serif;border:1px solid var(--border);background:none;color:var(--muted)}
+.tc-btn:hover{border-color:var(--violet);color:var(--violet)}
+.tc-btn.primary{background:linear-gradient(135deg,var(--purple),var(--pink));border:none;color:#fff}
+.empty-right{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:60px 40px;text-align:center;color:var(--muted)}
+.er-icon{font-size:48px;margin-bottom:16px}
+.er-text{font-size:14px;line-height:1.6}
+
+/* VARIATION CONTROLS */
+.variation-row{display:flex;gap:8px;margin-bottom:14px;align-items:center}
+.var-label{font-size:12px;color:var(--muted);white-space:nowrap}
+.var-btns{display:flex;gap:6px}
+.var-btn{padding:5px 12px;border-radius:6px;border:1px solid var(--border);font-size:11px;cursor:pointer;color:var(--muted);transition:all .15s;font-family:'Space Grotesk',sans-serif;background:none}
+.var-btn.active{border-color:var(--violet);color:var(--violet);background:rgba(124,58,237,.08)}
+
+.dots{display:inline-flex;gap:3px}
+.dots span{width:5px;height:5px;border-radius:50%;background:var(--violet);animation:ld .6s infinite}
+.dots span:nth-child(2){animation-delay:.12s}
+.dots span:nth-child(3){animation-delay:.24s}
+@keyframes ld{0%,100%{opacity:.3}50%{opacity:1}}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--green);color:var(--green);padding:12px 20px;border-radius:10px;font-size:13px;z-index:999;display:none}
+.toast.show{display:block}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo" onclick="window.location.href='index.html'">Lumeo</div>
+  <div class="nav-links">
+    <a href="index.html">Dashboard</a>
+    <a href="upload.html">Upload</a>
+    <a href="clips.html">My Clips</a>
+    <a href="captions.html">Captions</a>
+    <a href="thumbnails.html" class="active">Thumbnails</a>
+    <a href="studio.html">Studio</a>
+  </div>
+  <div class="user-dot">A</div>
+</nav>
+<div id="profileDropdown" style="display:none;position:fixed;top:60px;right:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:999;min-width:220px"></div>
+<div class="toast" id="toast"></div>
+
+<div class="page">
+  <div class="page-head">
+    <h1>Thumbnail Studio</h1>
+    <p>AI-generated thumbnails using 6 proven viral styles — no template, fully generated from scratch.</p>
+  </div>
+
+  <div class="layout">
+    <!-- LEFT -->
+    <div class="left-panel">
+      <div class="card">
+        <h3>Video Info</h3>
+        <label>Video Title or Topic</label>
+        <input type="text" id="thumbTitle" placeholder="e.g. I lived on ₹100/day in Mumbai for 30 days"/>
+        <label>Description (optional — improves results)</label>
+        <textarea id="thumbDesc" placeholder="Brief description of what happens in the video..."></textarea>
+      </div>
+
+      <div class="card">
+        <h3>Thumbnail Style</h3>
+        <div class="style-grid" id="styleGrid"></div>
+      </div>
+
+      <div class="card">
+        <h3>Variations</h3>
+        <div class="variation-row">
+          <div class="var-label">How many:</div>
+          <div class="var-btns">
+            <button class="var-btn active" onclick="setVar(this,1)">1</button>
+            <button class="var-btn" onclick="setVar(this,2)">2</button>
+            <button class="var-btn" onclick="setVar(this,4)">4</button>
+          </div>
+        </div>
+        <button class="gen-btn" id="genBtn" onclick="generate()">Generate Thumbnails →</button>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="right-panel">
+      <div id="rightContent">
+        <div class="empty-right">
+          <div class="er-icon">🖼️</div>
+          <div class="er-text">Enter your video title and click Generate.<br>AI creates unique thumbnails — no stock photos, no templates.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var BACKEND = 'http://localhost:3001';
+var selectedStyle = 'auto';
+var varCount = 1;
+
+var STYLES = {
+  auto: {name:'Auto-Detect',desc:'AI picks best style',example:'Recommended'},
+  spectacle: {name:'Spectacle & Scale',desc:'MrBeast/extreme style',example:'Challenge, viral, money'},
+  authority: {name:'Authority & Truth',desc:'Podcast/interview style',example:'CEO, secrets, revealed'},
+  transformation: {name:'Transformation',desc:'Before & after style',example:'Fitness, DIY, growth'},
+  curiosity: {name:'Curiosity Gap',desc:'VS/comparison style',example:'Cheap vs expensive'},
+  minimal: {name:'Intellectual Minimal',desc:'Ali Abdaal style',example:'Productivity, books'},
+  statistical: {name:'Statistical Shock',desc:'Data/fact heavy',example:'Numbers, analysis'},
+};
+
+function buildStyleGrid(){
+  var sg = document.getElementById('styleGrid');
+  sg.innerHTML = Object.entries(STYLES).map(function(entry){
+    var key=entry[0], s=entry[1];
+    return '<div class="style-btn '+(key==='auto'?'active':'')+'" onclick="selectStyle(this,\''+key+'\')">' +
+      '<div class="sb-name">'+s.name+'</div>' +
+      '<div class="sb-desc">'+s.desc+'</div>' +
+      '<div class="sb-example">'+s.example+'</div>' +
+    '</div>';
+  }).join('');
+}
+
+function selectStyle(btn, key){
+  document.querySelectorAll('.style-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  selectedStyle = key;
+}
+
+function setVar(btn, n){
+  document.querySelectorAll('.var-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  varCount = n;
+}
+
+async function generate(){
+  var title = document.getElementById('thumbTitle').value.trim();
+  var desc = document.getElementById('thumbDesc').value.trim();
+  if(!title){ showToast('Enter a video title first'); return; }
+
+  var btn = document.getElementById('genBtn');
+  btn.disabled=true; btn.textContent='Generating...';
+
+  // Show loading cards
+  var rc = document.getElementById('rightContent');
+  var loadCards = Array.from({length:varCount}, function(_,i){
+    return '<div class="thumb-card loading" id="tc'+i+'"><div class="tc-img"><div class="dots"><span></span><span></span><span></span></div><span>Generating with AI...</span></div><div class="tc-body"><div class="tc-style">Generating...</div><div class="tc-title">'+title+'</div></div></div>';
+  }).join('');
+  rc.innerHTML = '<div class="thumb-grid">'+loadCards+'</div>';
+
+  // Generate each variation
+  for(var i=0; i<varCount; i++){
+    try {
+      var res = await fetch(BACKEND+'/api/thumbnail/prompt', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({title, transcript:desc, styleOverride:selectedStyle==='auto'?null:selectedStyle})
+      });
+      var data = await res.json();
+
+      // Load image directly in browser — avoids server timeout issue
+      var imgUrl = data.url;
+      var card = document.getElementById('tc'+i);
+      if(card){
+        card.classList.remove('loading');
+        card.innerHTML =
+          '<div class="tc-img"><img src="'+imgUrl+'" alt="thumbnail" onerror="this.parentElement.innerHTML=\'<div style=&quot;height:180px;display:flex;align-items:center;justify-content:center;color:var(--red);font-size:12px;padding:16px;text-align:center&quot;>Generation failed — Pollinations is slow. Try again.</div>\'"/></div>'+
+          '<div class="tc-body">'+
+            '<div class="tc-style">✨ '+data.styleName+'</div>'+
+            '<div class="tc-title">'+title+'</div>'+
+            '<div class="tc-actions">'+
+              '<button class="tc-btn" onclick="window.open(\''+imgUrl+'\',\'_blank\')">Open Full Size</button>'+
+              '<a href="'+imgUrl+'" download="lumeo-thumbnail-'+i+'.jpg" class="tc-btn" style="display:flex;align-items:center;justify-content:center;text-decoration:none">⬇ Download</a>'+
+              '<button class="tc-btn primary" onclick="regenerateOne('+i+',\''+title+'\',\''+data.styleKey+'\')">Regenerate</button>'+
+            '</div>'+
+          '</div>';
+      }
+    } catch(e) {
+      var card = document.getElementById('tc'+i);
+      if(card) card.innerHTML = '<div style="padding:20px;color:var(--red);font-size:12px">Backend offline — run: cd backend → node server.js</div>';
+    }
+  }
+
+  btn.disabled=false; btn.textContent='Generate Thumbnails →';
+}
+
+async function regenerateOne(idx, title, styleKey){
+  var card = document.getElementById('tc'+idx);
+  if(!card) return;
+  card.classList.add('loading');
+  card.innerHTML = '<div class="tc-img"><div class="dots"><span></span><span></span><span></span></div></div>';
+  try {
+    var res = await fetch(BACKEND+'/api/thumbnail/prompt',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({title,styleOverride:styleKey})
+    });
+    var data = await res.json();
+    card.classList.remove('loading');
+    card.innerHTML =
+      '<div class="tc-img"><img src="'+data.url+'" alt="thumbnail"/></div>'+
+      '<div class="tc-body"><div class="tc-style">✨ '+data.styleName+'</div><div class="tc-title">'+title+'</div>'+
+      '<div class="tc-actions">'+
+        '<button class="tc-btn" onclick="window.open(\''+data.url+'\',\'_blank\')">Open Full Size</button>'+
+        '<a href="'+data.url+'" download="lumeo-thumbnail-'+idx+'.jpg" class="tc-btn" style="display:flex;align-items:center;justify-content:center;text-decoration:none">⬇ Download</a>'+
+        '<button class="tc-btn primary" onclick="regenerateOne('+idx+',\''+title+'\',\''+data.styleKey+'\')">Regenerate</button>'+
+      '</div></div>';
+  } catch(e){ showToast('Failed'); }
+}
+
+function showToast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3000);}
+buildStyleGrid();
+</script>
+<script src="nav.js"></script>
+</body>
+</html>

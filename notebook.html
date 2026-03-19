@@ -114,11 +114,11 @@ nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24
 <nav>
   <div class="nav-logo" onclick="window.location.href='index.html'">Lumeo</div>
   <div class="nav-links">
-    <a href="index.html">Dashboard</a>
+            <a href="index.html">Dashboard</a>
     <a href="upload.html">Upload</a>
     <a href="clips.html">My Clips</a>
-    <a href="editor.html">Editor</a>
-    <a href="notebook.html" class="active">Notebook</a>
+    <a href="captions.html">Captions</a>
+    <a href="thumbnails.html">Thumbnails</a>
     <a href="studio.html">Studio</a>
   </div>
   <div class="user-dot">A</div>
@@ -142,7 +142,7 @@ nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24
 </div>
 
 <script>
-var BACKEND = 'https://lumeo-p4g0.onrender.com';
+var BACKEND = 'http://localhost:3001';
 var jobs = JSON.parse(localStorage.getItem('lumeo_jobs') || '[]');
 var currentJob = null;
 var activeTab = 'summary';
